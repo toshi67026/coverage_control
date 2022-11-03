@@ -1,0 +1,15 @@
+agent_num: 2
+
+field:
+  grid_accuracy: [100]
+  limit: [[-1, 1]]
+
+agent_0:
+  x_init: 0.0
+  y_init: 0
+  z_init: 0
+
+agent_1:
+  x_init: 0.3
+  y_init: 0
+  z_init: 0

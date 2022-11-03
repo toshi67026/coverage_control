@@ -1,0 +1,3 @@
+[submodule "src/voronoi_tessellation"]
+	path = src/voronoi_tessellation
+	url = git@github.com:toshi67026/voronoi_tessellation.git
