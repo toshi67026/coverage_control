@@ -1,0 +1,10 @@
+sympy
+numpy
+scipy
+matplotlib
+
+black
+mypy
+
+--extra-index-url https://rospypi.github.io/simple/
+ros-stubs-all
