@@ -1,0 +1,13 @@
+<launch>
+  <arg name="id" default=""/>
+  <arg name="agent_name" value="agent_$(arg id)"/>
+
+  <group ns="$(arg agent_name)">
+    <param name="agent_id" value="$(arg id)"/>
+
+    <node name="agent_body" pkg="coverage_control" type="agent_body.py"/>
+    <node name="controller" pkg="coverage_control" type="controller.py"/>
+    <node name="sensing_region_marker_visualizer" pkg="coverage_control" type="sensing_region_marker_visualizer.py"/>
+    <node name="sensing_region_pointcloud_visualizer" pkg="coverage_control" type="sensing_region_pointcloud_visualizer.py"/>
+  </group>
+</launch>

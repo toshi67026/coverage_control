@@ -1,0 +1,44 @@
+<launch>
+  <env name="ROSCONSOLE_FORMAT" value="[${severity}] [${node}]: ${message}"/>
+  <rosparam command="delete" param="/"/>
+
+  <arg name="dim" default="2" doc="{1, 2, 3}"/>
+
+  <rosparam command="load" file="$(find coverage_control)/config/base.yaml"/>
+
+  <!--次元に応じてconfig fileを変更-->
+  <rosparam command="load" file="$(find coverage_control)/config/$(arg dim)d.yaml"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find coverage_control)/rviz/$(arg dim)d.rviz"/>
+
+  <node name="pose_collector" pkg="coverage_control" type="pose_collector.py"/>
+
+  <include file="$(find coverage_control)/launch/agent.launch">
+    <arg name="id" value="0"/>
+  </include>
+  <include file="$(find coverage_control)/launch/agent.launch">
+    <arg name="id" value="1"/>
+  </include>
+
+  <group if="$(eval dim == 2 or dim == 3)">
+    <include file="$(find coverage_control)/launch/agent.launch">
+      <arg name="id" value="2"/>
+    </include>
+  </group>
+
+  <group if="$(eval dim == 3)">
+    <include file="$(find coverage_control)/launch/agent.launch">
+      <arg name="id" value="3"/>
+    </include>
+    <include file="$(find coverage_control)/launch/agent.launch">
+      <arg name="id" value="4"/>
+    </include>
+    <include file="$(find coverage_control)/launch/agent.launch">
+      <arg name="id" value="5"/>
+    </include>
+  </group>
+
+  <node name="central" pkg="coverage_control" type="central.py"/>
+  <node name="phi_pointcloud_visualizer" pkg="coverage_control" type="phi_pointcloud_visualizer.py"/>
+  <node name="phi_marker_visualizer" pkg="coverage_control" type="phi_marker_visualizer.py"/>
+
+</launch>
