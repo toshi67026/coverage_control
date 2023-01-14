@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import Any, List, Sequence, TypeVar
+from typing import Any, List, Sequence, TypeVar, Union
 
 import matplotlib.colors as mcolors
 import numpy as np
@@ -13,7 +13,7 @@ color_list = ["r", "g", "b", "m", "c", "y"]
 
 
 def padding(
-    original_array: Sequence,
+    original_array: Union[Sequence, NDArray],
     return_list_length: int = 3,
     padding_value: float = 0.0,
 ) -> List[float]:
@@ -47,16 +47,16 @@ MultiArray = TypeVar("MultiArray")
 
 def ndarray_to_multiarray(multiarray_type: MultiArray, ndarray: NDArray) -> MultiArray:
     """Convert numpy.ndarray to multiarray"""
-    multiarray = multiarray_type()
+    multiarray = multiarray_type()  # type: ignore
     multiarray.layout.dim = [
         MultiArrayDimension(f"dim{i}", ndarray.shape[i], ndarray.shape[i] * ndarray.dtype.itemsize)
         for i in range(ndarray.ndim)
     ]
-    multiarray.data: List[float] = ndarray.reshape(1, -1)[0].tolist()
-    return multiarray
+    multiarray.data: List[float] = ndarray.reshape(1, -1)[0].tolist()  # type: ignore
+    return multiarray  # type: ignore
 
 
 def multiarray_to_ndarray(pytype: Any, dtype: Any, multiarray: MultiArray) -> NDArray:
     """Convert multiarray to numpy.ndarray"""
-    dims = [multiarray.layout.dim[i].size for i in range(len(multiarray.layout.dim))]
-    return np.array(multiarray.data, dtype=pytype).reshape(dims).astype(dtype)
+    dims = [multiarray.layout.dim[i].size for i in range(len(multiarray.layout.dim))]  # type: ignore
+    return np.array(multiarray.data, dtype=pytype).reshape(dims).astype(dtype)  # type: ignore

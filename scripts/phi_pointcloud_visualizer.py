@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 
 import traceback
-from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
 import rospy
+from coverage_control.field_generator import FieldGenerator
+from coverage_control.utils import multiarray_to_ndarray
 from numpy.typing import NDArray
 from sensor_msgs.msg import PointCloud2, PointField
 from std_msgs.msg import Float32MultiArray, Header
-
-from coverage_control.field_generator import FieldGenerator
-from coverage_control.utils import padding
 
 
 class PhiPointCloudVisualizer:
@@ -26,7 +24,7 @@ class PhiPointCloudVisualizer:
             [xn, yn, ...]]
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         rospy.init_node("phi_pointcloud_visualizer")
 
         world_frame = str(rospy.get_param("/world_frame", default="world"))
@@ -58,7 +56,7 @@ class PhiPointCloudVisualizer:
             ],
             is_bigendian=False,
             point_step=24,
-            is_dense=12,
+            is_dense=True,
         )
 
         # pub
@@ -68,13 +66,10 @@ class PhiPointCloudVisualizer:
         rospy.Subscriber("phi", Float32MultiArray, self.phi_callback)
 
     def phi_callback(self, msg: Float32MultiArray) -> None:
-        self.publish_pointcloud(msg.data)
-
-    def publish_pointcloud(self, data: List[float]) -> None:
         """Float32Multiarrayからpointcloudを生成してpublish
 
         Args:
-            data (List[float]): 重要度分布
+            msg (Float32MultiArray): 重要度分布
 
         Note:
             points = [
@@ -85,7 +80,7 @@ class PhiPointCloudVisualizer:
 
             pointsのz座標等にphiを反映することで，座標でも重要度を表現可能
         """
-        phi = np.array(data).reshape([-1, 1])
+        phi = multiarray_to_ndarray(float, np.float32, msg).reshape([-1, 1])
 
         # 次元を調整しつつmatplotlibのcolor_mapを利用して，重要度を色で表現
         rgba_phi: NDArray = plt.get_cmap("jet")(phi).squeeze()

@@ -20,7 +20,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: sensing_region
+    SyncSource: phi
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -88,13 +88,13 @@ Visualization Manager:
       Update Interval: 0
       Value: true
     - Class: rviz/Marker
-      Enabled: false
+      Enabled: true
       Marker Topic: /agent_0/sensing_region_marker
       Name: sensing_region
       Namespaces:
-        {}
+        sensing_region_marker: true
       Queue Size: 1
-      Value: false
+      Value: true
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /agent_1/sensing_region_marker
@@ -112,21 +112,21 @@ Visualization Manager:
       Queue Size: 1
       Value: true
     - Class: rviz/Marker
-      Enabled: false
+      Enabled: true
       Marker Topic: /agent_3/sensing_region_marker
       Name: sensing_region
       Namespaces:
-        {}
+        sensing_region_marker: true
       Queue Size: 1
-      Value: false
+      Value: true
     - Class: rviz/Marker
-      Enabled: false
+      Enabled: true
       Marker Topic: /agent_4/sensing_region_marker
       Name: sensing_region
       Namespaces:
-        {}
+        sensing_region_marker: true
       Queue Size: 1
-      Value: false
+      Value: true
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /agent_5/sensing_region_marker
@@ -357,7 +357,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.075700759887695
+      Distance: 3.902153730392456
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -365,17 +365,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.0677257776260376
-        Y: 0.0861063301563263
-        Z: -0.1051923856139183
+        X: -0.09278398752212524
+        Y: 0.12678922712802887
+        Z: -0.11424878239631653
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.49039891362190247
+      Pitch: 0.5253990888595581
       Target Frame: <Fixed Frame>
-      Yaw: 3.5585455894470215
+      Yaw: 3.583540201187134
     Saved: ~
 Window Geometry:
   Displays:

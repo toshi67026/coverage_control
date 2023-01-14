@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 
 import traceback
-from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
 import rospy
+from coverage_control.field_generator import FieldGenerator
+from coverage_control.utils import multiarray_to_ndarray, padding
 from geometry_msgs.msg import Point, Pose, Quaternion, Vector3
 from numpy.typing import NDArray
 from std_msgs.msg import ColorRGBA, Float32MultiArray, Header
 from visualization_msgs.msg import Marker
-
-from coverage_control.field_generator import FieldGenerator
-from coverage_control.utils import multiarray_to_ndarray, padding
 
 
 class PhiMarkerVisualizer:
@@ -39,7 +37,7 @@ class PhiMarkerVisualizer:
         dim = len(grid_accuracy)
 
         # 次元に応じて適切な透過度を選択
-        self.alpha = 0.7 - 0.15 * dim
+        self.alpha = 0.7 - 0.2 * dim
 
         field_generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
         grid_map = field_generator.generate_grid_map()

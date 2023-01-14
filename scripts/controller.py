@@ -5,14 +5,12 @@ from typing import List, Tuple
 
 import numpy as np
 import rospy
+from coverage_control.field_generator import FieldGenerator
+from coverage_control.utils import multiarray_to_ndarray, ndarray_to_multiarray, padding
+from coverage_control.voronoi import Voronoi
 from geometry_msgs.msg import Point, Pose, PoseArray, Twist, Vector3
 from numpy.typing import NDArray
-from std_msgs.msg import Float32MultiArray
-
-from coverage_control.field_generator import FieldGenerator
-from coverage_control.utils import (multiarray_to_ndarray,
-                                    ndarray_to_multiarray, padding)
-from coverage_control.voronoi import Voronoi
+from std_msgs.msg import Float32MultiArray, Int8MultiArray
 
 
 class Controller:
@@ -47,7 +45,7 @@ class Controller:
 
         # pub
         self.cmd_vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=1)
-        self.sensing_region_pub = rospy.Publisher("sensing_region", Float32MultiArray, queue_size=1)
+        self.sensing_region_pub = rospy.Publisher("sensing_region", Int8MultiArray, queue_size=1)
 
         # sub
         rospy.Subscriber("curr_pose", Pose, self.curr_pose_callback, queue_size=1)
@@ -61,10 +59,10 @@ class Controller:
         self.curr_pose = msg
 
     def curr_pose_array_callback(self, msg: PoseArray) -> None:
-        """センシング領域とその重心を計算し，目標座標へ反映
+        """センシング領域とその重心を計算して目標座標へ反映
 
         Note:
-            センシング領域のpublishに際しては以下の並びとなるよう，reshapeと転置により整形
+            センシング領域のpublishに際しては，以下の並びになるようreshapeと転置により整形
             [[x1, y1, ...],
             [x2, y2, ...]
                 :
@@ -72,18 +70,13 @@ class Controller:
         """
 
         # 近隣エージェントの位置を用いてセンシング領域を計算
-        centroid_position, sensing_region_grid_map, _ = self.calc_voronoi_tesselation(msg.poses)
+        centroid_position, sensing_region_grid_map, sensing_region = self.calc_voronoi_tesselation(msg.poses)
 
         # 各次元に対応して使わない部分を0で埋めた上で，unpackしたもの目標座標とする
         self.ref_pose = Pose(position=Point(*padding(centroid_position)))
 
         # センシング領域をpublish
-        self.sensing_region_pub.publish(
-            ndarray_to_multiarray(
-                Float32MultiArray,
-                np.array(sensing_region_grid_map).reshape(self.dim, -1).T,
-            )
-        )
+        self.sensing_region_pub.publish(ndarray_to_multiarray(Int8MultiArray, sensing_region))
 
     def calc_voronoi_tesselation(self, pose_list: List[Pose]) -> Tuple[NDArray, List[NDArray], NDArray]:
         all_agent_position_list: List[NDArray] = []

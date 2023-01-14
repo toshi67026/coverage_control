@@ -4,11 +4,10 @@ import traceback
 
 import numpy as np
 import rospy
-from numpy.typing import NDArray
-from std_msgs.msg import Float32MultiArray
-
 from coverage_control.field_generator import FieldGenerator
 from coverage_control.utils import ndarray_to_multiarray
+from numpy.typing import NDArray
+from std_msgs.msg import Float32MultiArray
 
 
 class Central:
