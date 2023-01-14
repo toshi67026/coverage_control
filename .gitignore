@@ -1,8 +1,8 @@
+.vscode
 build
 devel
 logs
 *.pyc
 __pycache__
 .mypy_cache
-.vscode
-
+.ruff_cache

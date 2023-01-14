@@ -40,11 +40,11 @@ class FieldGenerator:
             for i in range(dim)
         ]
 
-    def generate_phi(self):
+    def generate_phi(self) -> NDArray:
         """重要度分布を生成"""
         return np.ones(self.grid_accuracy)
 
-    def generate_grid_map(self):
+    def generate_grid_map(self) -> List[NDArray]:
         """フィールド格子点を生成
 
         Returns:
@@ -57,7 +57,7 @@ def test() -> None:
     limit = np.array([[-1, 1], [-2, 2], [-3, 3]])
     grid_accuracy = np.array([100, 200, 300])
     generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
-    x_grid_map, y_grid_map, z_grid_map = generator.generate_grid(sparse=False)
+    x_grid_map, y_grid_map, z_grid_map = generator.generate_grid_map()
     print(f"x.shape: {x_grid_map.shape}, y.shape: {y_grid_map.shape}, z.shape: {z_grid_map.shape}")
 
 

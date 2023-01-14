@@ -4,13 +4,12 @@ import traceback
 
 import numpy as np
 import rospy
+from coverage_control.field_generator import FieldGenerator
+from coverage_control.utils import color_list, get_color_rgba, multiarray_to_ndarray, padding
 from geometry_msgs.msg import Point, Pose, Quaternion, Vector3
 from numpy.typing import NDArray
-from std_msgs.msg import Float32MultiArray, Header
+from std_msgs.msg import Header, Int8MultiArray
 from visualization_msgs.msg import Marker
-
-from coverage_control.field_generator import FieldGenerator
-from coverage_control.utils import color_list, get_color_rgba, padding
 
 
 class SensingRegionMarkerVisualizer:
@@ -27,11 +26,11 @@ class SensingRegionMarkerVisualizer:
         field_param = rospy.get_param("/field")
         grid_accuracy: NDArray = np.array(field_param["grid_accuracy"])
         limit: NDArray = np.array(field_param["limit"])
+        field_generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
+        self.grid_map = field_generator.generate_grid_map()
         self.dim = len(grid_accuracy)
         # 次元に応じて適切な透過度を選択
         self.alpha = 0.7 - 0.15 * self.dim
-
-        field_generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
 
         # センシング領域描画用のMarkerを作成
         self.sensing_region_marker = Marker(
@@ -55,10 +54,25 @@ class SensingRegionMarkerVisualizer:
         self.sensing_region_marker_pub = rospy.Publisher("sensing_region_marker", Marker, queue_size=1)
 
         # sub
-        rospy.Subscriber("sensing_region", Float32MultiArray, self.sensing_region_callback)
+        rospy.Subscriber("sensing_region", Int8MultiArray, self.sensing_region_callback)
 
-    def sensing_region_callback(self, msg: Float32MultiArray) -> None:
-        sensing_region_grid_map = np.array(msg.data).reshape(-1, self.dim)
+    def sensing_region_callback(self, msg: Int8MultiArray) -> None:
+        """Int8Multiarrayからpointcloudを生成してpublish
+
+        Args:
+            msg (Int8MultiArray): センシング領域
+
+        Note:
+            センシング領域の格子点計算に際しては，以下の並びになるようreshapeと転置により整形
+            [[x1, y1, ...],
+            [x2, y2, ...]
+                :
+            [xn, yn, ...]]
+        """
+        sensing_region = multiarray_to_ndarray(bool, np.bool_, msg)
+        sensing_region_grid_map = (
+            np.array([self.grid_map[i][sensing_region] for i in range(self.dim)]).reshape(self.dim, -1).T
+        )
 
         self.sensing_region_marker.header.stamp = rospy.Time.now()
         # 2次元以下の場合は足りない座標分を0埋め

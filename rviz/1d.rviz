@@ -20,7 +20,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: sensing_region
+    SyncSource: phi
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -163,7 +163,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGBF32
       Decay Time: 0
-      Enabled: false
+      Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Min Color: 0; 0; 0
@@ -178,7 +178,7 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
