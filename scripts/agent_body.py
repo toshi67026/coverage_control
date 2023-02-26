@@ -15,26 +15,21 @@ class AgentBody:
         rospy.init_node("agent_body")
 
         # 初期位置姿勢
-        x_init = float(rospy.get_param("x_init", default=0.0))
-        y_init = float(rospy.get_param("y_init", default=0.0))
-        z_init = float(rospy.get_param("z_init", default=0.0))
-        yaw_init = float(rospy.get_param("yaw_init", default=0.0))
+        initial_position = Point(
+            x=float(rospy.get_param("x_init", default=0.0)),
+            y=float(rospy.get_param("y_init", default=0.0)),
+            z=float(rospy.get_param("z_init", default=0.0)),
+        )
+        initial_orientation = Quaternion(
+            *quaternion_from_euler(ai=0.0, aj=0.0, ak=float(rospy.get_param("yaw_init", default=0.0)))
+        )
 
         self.world_frame = str(rospy.get_param("/world_frame", default="world"))
         agent_name = str(rospy.get_namespace().lstrip("/"))
         self.agent_frame = agent_name + str(rospy.get_param("/agent_frame", default="base"))
         self.dt = float(rospy.get_param("/dt", default=0.1))
 
-        orientation_array = quaternion_from_euler(ai=0.0, aj=0.0, ak=yaw_init)
-        self.curr_pose = Pose(
-            position=Point(x=x_init, y=y_init, z=z_init),
-            orientation=Quaternion(
-                x=orientation_array[0],
-                y=orientation_array[1],
-                z=orientation_array[2],
-                w=orientation_array[3],
-            ),
-        )
+        self.curr_pose = Pose(position=initial_position, orientation=initial_orientation)
 
         # tf2
         self.tf_buffer = Buffer()
