@@ -5,11 +5,12 @@ import traceback
 import matplotlib.pyplot as plt
 import numpy as np
 import rospy
-from coverage_control.field_generator import FieldGenerator
-from coverage_control.utils import multiarray_to_ndarray
 from numpy.typing import NDArray
 from sensor_msgs.msg import PointCloud2, PointField
 from std_msgs.msg import Float32MultiArray, Header
+
+from coverage_control.field_generator import FieldGenerator
+from coverage_control.utils import multiarray_to_ndarray
 
 
 class PhiPointCloudVisualizer:

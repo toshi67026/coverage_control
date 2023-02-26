@@ -5,11 +5,12 @@ import traceback
 import matplotlib.colors as mcolors
 import numpy as np
 import rospy
-from coverage_control.field_generator import FieldGenerator
-from coverage_control.utils import color_list, multiarray_to_ndarray
 from numpy.typing import NDArray
 from sensor_msgs.msg import PointCloud2, PointField
 from std_msgs.msg import Header, Int8MultiArray
+
+from coverage_control.field_generator import FieldGenerator
+from coverage_control.utils import color_list, multiarray_to_ndarray
 
 
 class SensingRegionPointCloudVisualizer:

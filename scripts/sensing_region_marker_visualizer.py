@@ -4,12 +4,13 @@ import traceback
 
 import numpy as np
 import rospy
-from coverage_control.field_generator import FieldGenerator
-from coverage_control.utils import color_list, get_color_rgba, multiarray_to_ndarray, padding
 from geometry_msgs.msg import Point, Pose, Quaternion, Vector3
 from numpy.typing import NDArray
 from std_msgs.msg import Header, Int8MultiArray
 from visualization_msgs.msg import Marker
+
+from coverage_control.field_generator import FieldGenerator
+from coverage_control.utils import color_list, get_color_rgba, multiarray_to_ndarray, padding
 
 
 class SensingRegionMarkerVisualizer:

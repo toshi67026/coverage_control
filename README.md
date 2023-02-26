@@ -5,6 +5,7 @@
 - ROS Noetic
 - Python3.8
 
+## Installation
 ```sh
 cd ~/catkin_ws/src/coverage_control
 python3 -m pip install -r requirements.txt
@@ -30,13 +31,23 @@ dim:={1, 2, 3}
 2d version
 ![](assets/scc_2d_rosgraph.png)
 
-## tools
-### mypy
+## Tools
+### Format
+- isort
+- black
 ```sh
-./tools/run_mypy.sh
+task fmt
 ```
 
-### black
+### Lint
+- black
+- ruff
 ```sh
-./tools/run_black.sh
+task lint
+```
+
+### mypy
+- mypy
+```sh
+task mypy
 ```
