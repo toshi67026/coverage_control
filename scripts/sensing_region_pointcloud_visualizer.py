@@ -73,7 +73,7 @@ class SensingRegionPointCloudVisualizer:
             [xn, yn, zn, rn, gn, bn]]
         """
         sensing_region = multiarray_to_ndarray(bool, np.bool_, msg)
-        sensing_region_grid_map = (
+        sensing_region_grid_points = (
             np.array([self.grid_map[i][sensing_region] for i in range(self.dim)]).reshape(self.dim, -1).T
         )
 
@@ -84,9 +84,9 @@ class SensingRegionPointCloudVisualizer:
         # 2次元以下の場合は足りない座標分を0埋め
         points = np.hstack(
             [
-                sensing_region_grid_map,
-                np.zeros([sensing_region_grid_map.shape[0], 3 - self.dim]),
-                np.repeat(rgba_agent[:, 0:3], sensing_region_grid_map.shape[0], axis=0),
+                sensing_region_grid_points,
+                np.zeros([sensing_region_grid_points.shape[0], 3 - self.dim]),
+                np.repeat(rgba_agent[:, 0:3], sensing_region_grid_points.shape[0], axis=0),
             ]
         ).astype(np.float32)
 

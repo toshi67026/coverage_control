@@ -71,18 +71,18 @@ class SensingRegionMarkerVisualizer:
             [xn, yn, ...]]
         """
         sensing_region = multiarray_to_ndarray(bool, np.bool_, msg)
-        sensing_region_grid_map = (
+        sensing_region_grid_points = (
             np.array([self.grid_map[i][sensing_region] for i in range(self.dim)]).reshape(self.dim, -1).T
         )
 
         self.sensing_region_marker.header.stamp = rospy.Time.now()
         # 2次元以下の場合は足りない座標分を0埋め
         self.sensing_region_marker.points = [
-            Point(*point) for point in [padding(point) for point in sensing_region_grid_map]
+            Point(*point) for point in [padding(point) for point in sensing_region_grid_points]
         ]
         self.sensing_region_marker.colors = [
             get_color_rgba(color_list[self.agent_id], self.alpha)
-        ] * sensing_region_grid_map.shape[0]
+        ] * sensing_region_grid_points.shape[0]
 
         self.sensing_region_marker_pub.publish(self.sensing_region_marker)
 

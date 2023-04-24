@@ -71,7 +71,7 @@ class Controller:
         """
 
         # 近隣エージェントの位置を用いてセンシング領域を計算
-        centroid_position, sensing_region_grid_map, sensing_region = self.calc_voronoi_tesselation(msg.poses)
+        centroid_position, sensing_region_grid_points, sensing_region = self.calc_voronoi_tesselation(msg.poses)
 
         # 各次元に対応して使わない部分を0で埋めた上で，unpackしたもの目標座標とする
         self.ref_pose = Pose(position=Point(*padding(centroid_position)))
@@ -96,14 +96,14 @@ class Controller:
 
         # センシング領域を計算
         # 円形センサーモデル使用時は，性能関数としてK.Sugimoto et al. 2015のh_{1}を採用した場合の最適解に相当
-        centroid_position, sensing_region_grid_map, sensing_region = self.voronoi.calc_tesselation(
+        centroid_position, sensing_region_grid_points, sensing_region = self.voronoi.calc_tesselation(
             agent_position=agent_position,
             neighbor_agent_position_list=neighbor_agent_position_list,
             phi=self.phi,
             grid_map=self.grid_map,
             point_density=self.point_density,
         )
-        return centroid_position, sensing_region_grid_map, sensing_region
+        return centroid_position, sensing_region_grid_points, sensing_region
 
     def phi_callback(self, msg: Float32MultiArray) -> None:
         self.phi = multiarray_to_ndarray(float, np.float32, msg)

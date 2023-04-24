@@ -13,7 +13,7 @@ class Voronoi:
 
     Attributes:
         p (float): p-norm
-        radius (float): センサーモデルの半径．Defaults to float("inf")
+        radius (float): r-limited voronoi計算における半径．FOVの規定に用いる．Defaults to float("inf")
 
     Note:
         各領域内の離散点に相当する位置にはTrue，それ以外にはFalseを割り当てる．
@@ -72,8 +72,8 @@ class Voronoi:
 
         # センシング領域の重心計算
         centroid_position = self.calc_centroid_position(grid_map, phi, sensing_region, point_density, dim)
-        sensing_region_grid_map = [grid_map[i][sensing_region] for i in range(dim)]
-        return centroid_position, sensing_region_grid_map, sensing_region
+        sensing_region_grid_points = [grid_map[i][sensing_region] for i in range(dim)]
+        return centroid_position, sensing_region_grid_points, sensing_region
 
     @staticmethod
     def calc_centroid_position(
