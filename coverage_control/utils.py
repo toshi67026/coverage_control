@@ -35,11 +35,11 @@ def padding(
 
 
 def get_color_rgba(color: str, alpha: float = 1.0) -> ColorRGBA:
-    return ColorRGBA(*mcolors.to_rgba(color, alpha))
+    return ColorRGBA(**dict(zip(["r", "g", "b", "a"], mcolors.to_rgba(color, alpha))))
 
 
 def get_random_color_rgba(alpha: float = 1.0) -> ColorRGBA:
-    return ColorRGBA(*(*np.random.random(3), alpha))
+    return ColorRGBA(**dict(zip(["r", "g", "b", "a"], [*np.random.random(3), alpha])))
 
 
 MultiArray = TypeVar("MultiArray")
@@ -49,7 +49,7 @@ def ndarray_to_multiarray(multiarray_type: MultiArray, ndarray: NDArray) -> Mult
     """Convert numpy.ndarray to multiarray"""
     multiarray = multiarray_type()  # type: ignore
     multiarray.layout.dim = [
-        MultiArrayDimension(f"dim{i}", ndarray.shape[i], ndarray.shape[i] * ndarray.dtype.itemsize)
+        MultiArrayDimension(label=f"dim{i}", size=ndarray.shape[i], stride=ndarray.shape[i] * ndarray.dtype.itemsize)
         for i in range(ndarray.ndim)
     ]
     multiarray.data: List[float] = ndarray.reshape(1, -1)[0].tolist()  # type: ignore

@@ -4,9 +4,11 @@ import traceback
 from typing import List, Tuple
 
 import numpy as np
-import rospy
+import rclpy
 from geometry_msgs.msg import Point, Pose, PoseArray, Twist, Vector3
 from numpy.typing import NDArray
+from rcl_interfaces.msg import ParameterDescriptor, ParameterType
+from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray, Int8MultiArray
 
 from coverage_control.field_generator import FieldGenerator
@@ -14,22 +16,42 @@ from coverage_control.utils import multiarray_to_ndarray, ndarray_to_multiarray,
 from coverage_control.voronoi import Voronoi
 
 
-class Controller:
+class Controller(Node):
     """エージェントのローカル制御器"""
 
     def __init__(self) -> None:
-        rospy.init_node("controller")
+        super().__init__("controller")
 
-        self.world_frame = str(rospy.get_param("/world_frame", default="world"))
+        # declare parameter
+        self.declare_parameter("world_frame", "world", ParameterDescriptor(type=ParameterType.PARAMETER_STRING))
+        self.declare_parameter("agent_id", 0, ParameterDescriptor(type=ParameterType.PARAMETER_INTEGER))
+        self.declare_parameter("agent_num", 0, ParameterDescriptor(type=ParameterType.PARAMETER_INTEGER))
 
-        self.agent_id = int(rospy.get_param("agent_id", default=0))
-        self.agent_num = int(rospy.get_param("/agent_num", default=1))
+        self.declare_parameter(
+            "grid_accuracy", [100, 100, 100], ParameterDescriptor(type=ParameterType.PARAMETER_INTEGER_ARRAY)
+        )
+        self.declare_parameter("x_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter("y_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter("z_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter("kp", 1.0, ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE))
+        self.declare_parameter("timer_period", 0.1, ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE))
+
+        # get parameter
+        self.world_frame = self.get_parameter("world_frame").value
+
+        self.agent_id = self.get_parameter("agent_id").value
+        self.agent_num = self.get_parameter("agent_num").value
 
         # fieldを規定するパラメータを取得
-        field_param = rospy.get_param("/field")
-        grid_accuracy: NDArray = np.array(field_param["grid_accuracy"])
-        limit: NDArray = np.array(field_param["limit"])
+        grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
         self.dim = len(grid_accuracy)
+        limit = np.array(
+            [
+                self.get_parameter("x_limit").value,
+                self.get_parameter("y_limit").value,
+                self.get_parameter("z_limit").value,
+            ]
+        )
 
         field_generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
 
@@ -41,20 +63,20 @@ class Controller:
 
         self.ref_pose = Pose()
         self.curr_pose = Pose()
-        self.kp = float(rospy.get_param("/kp", default=1))
-        timer_period = float(rospy.get_param("/timer_period", default=0.1))
+        self.kp = self.get_parameter("kp").value
+        timer_period = self.get_parameter("timer_period").value
 
         # pub
-        self.cmd_vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=1)
-        self.sensing_region_pub = rospy.Publisher("sensing_region", Int8MultiArray, queue_size=1)
+        self.cmd_vel_pub = self.create_publisher(Twist, "cmd_vel", 10)
+        self.sensing_region_pub = self.create_publisher(Int8MultiArray, "sensing_region", 10)
 
         # sub
-        rospy.Subscriber("curr_pose", Pose, self.curr_pose_callback, queue_size=1)
-        rospy.Subscriber("/curr_pose_array", PoseArray, self.curr_pose_array_callback)
-        rospy.Subscriber("/phi", Float32MultiArray, self.phi_callback)
+        self.create_subscription(Pose, "curr_pose", self.curr_pose_callback, 10)
+        self.create_subscription(PoseArray, "/curr_pose_array", self.curr_pose_array_callback, 10)
+        self.create_subscription(Float32MultiArray, "/phi", self.phi_callback, 10)
 
         # timer
-        rospy.Timer(rospy.Duration(timer_period), self.timer_callback)
+        self.create_timer(timer_period, self.timer_callback)
 
     def curr_pose_callback(self, msg: Pose) -> None:
         self.curr_pose = msg
@@ -74,7 +96,7 @@ class Controller:
         centroid_position, sensing_region_grid_points, sensing_region = self.calc_voronoi_tesselation(msg.poses)
 
         # 各次元に対応して使わない部分を0で埋めた上で，unpackしたもの目標座標とする
-        self.ref_pose = Pose(position=Point(*padding(centroid_position)))
+        self.ref_pose = Pose(position=Point(**dict(zip(["x", "y", "z"], padding(centroid_position)))))
 
         # センシング領域をpublish
         self.sensing_region_pub.publish(ndarray_to_multiarray(Int8MultiArray, sensing_region))
@@ -108,7 +130,7 @@ class Controller:
     def phi_callback(self, msg: Float32MultiArray) -> None:
         self.phi = multiarray_to_ndarray(float, np.float32, msg)
 
-    def timer_callback(self, timer: rospy.Timer) -> None:
+    def timer_callback(self) -> None:
         # 位置偏差
         x_err = self.ref_pose.position.x - self.curr_pose.position.x
         y_err = self.ref_pose.position.y - self.curr_pose.position.y
@@ -125,11 +147,16 @@ class Controller:
 
 
 def main() -> None:
+    rclpy.init()
+    controller = Controller()
+
     try:
-        Controller()
-        rospy.spin()
+        rclpy.spin(controller)
     except:
-        rospy.logerr(traceback.format_exc())
+        controller.get_logger().error(traceback.format_exc())
+    finally:
+        controller.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == "__main__":

@@ -1,7 +1,0 @@
-world_frame: "world"
-agent_frame: "base"
-agent_prefix: "agent_"
-
-kp: 1.0
-timer_period: 0.1
-dt: 0.1

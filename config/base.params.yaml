@@ -1,0 +1,13 @@
+/**:
+  ros__parameters:
+    agent_num: 3
+    grid_accuracy: [50, 50]
+    x_limit: [-1.0, 1.0]
+    y_limit: [-1.0, 1.0]
+    world_frame: "world"
+    agent_frame: "base"
+    agent_prefix: "agent"
+
+    kp: 0.01
+    timer_period: 0.1
+    dt: 0.1

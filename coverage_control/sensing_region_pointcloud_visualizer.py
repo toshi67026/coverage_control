@@ -4,8 +4,10 @@ import traceback
 
 import matplotlib.colors as mcolors
 import numpy as np
-import rospy
+import rclpy
 from numpy.typing import NDArray
+from rcl_interfaces.msg import ParameterDescriptor, ParameterType
+from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2, PointField
 from std_msgs.msg import Header, Int8MultiArray
 
@@ -13,38 +15,53 @@ from coverage_control.field_generator import FieldGenerator
 from coverage_control.utils import color_list, multiarray_to_ndarray
 
 
-class SensingRegionPointCloudVisualizer:
+class SensingRegionPointCloudVisualizer(Node):
     """PointCloud2を用いてセンシング領域を可視化"""
 
     def __init__(self) -> None:
-        rospy.init_node("sensing_region_pointcloud_visualizer")
+        super().__init__("sensing_region_pointcloud_visualizer")
 
-        world_frame = str(rospy.get_param("/world_frame", default="world"))
+        # declare parameter
+        self.declare_parameter("world_frame", "world", ParameterDescriptor(type=ParameterType.PARAMETER_STRING))
+        self.declare_parameter("agent_id", 0, ParameterDescriptor(type=ParameterType.PARAMETER_INTEGER))
+        self.declare_parameter(
+            "grid_accuracy", [100, 100, 100], ParameterDescriptor(type=ParameterType.PARAMETER_INTEGER_ARRAY)
+        )
+        self.declare_parameter("x_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter("y_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter("z_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
 
-        self.agent_id = int(rospy.get_param("agent_id", default=0))
+        # get parameter
+        world_frame = self.get_parameter("world_frame").value
+        self.agent_id = self.get_parameter("agent_id").value
 
-        # fieldを規定するパラメータを取得
-        field_param = rospy.get_param("/field")
-        grid_accuracy: NDArray = np.array(field_param["grid_accuracy"])
-        limit: NDArray = np.array(field_param["limit"])
+        grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
+        self.dim = len(grid_accuracy)
+        limit = np.array(
+            [
+                self.get_parameter("x_limit").value,
+                self.get_parameter("y_limit").value,
+                self.get_parameter("z_limit").value,
+            ]
+        )
+
         field_generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
         self.grid_map = field_generator.generate_grid_map()
-        self.dim = len(grid_accuracy)
 
         # センシング領域描画用のpointcloudを作成
         self.sensing_region_pointcloud = PointCloud2(
             header=Header(
-                stamp=rospy.Time.now(),
+                stamp=self.get_clock().now().to_msg(),
                 frame_id=world_frame,
             ),
             height=1,
             fields=[
-                PointField("x", 0, PointField.FLOAT32, 1),
-                PointField("y", 4, PointField.FLOAT32, 1),
-                PointField("z", 8, PointField.FLOAT32, 1),
-                PointField("r", 12, PointField.FLOAT32, 1),
-                PointField("g", 16, PointField.FLOAT32, 1),
-                PointField("b", 20, PointField.FLOAT32, 1),
+                PointField(name="x", offset=0, datatype=PointField.FLOAT32, count=1),
+                PointField(name="y", offset=4, datatype=PointField.FLOAT32, count=1),
+                PointField(name="z", offset=8, datatype=PointField.FLOAT32, count=1),
+                PointField(name="r", offset=12, datatype=PointField.FLOAT32, count=1),
+                PointField(name="g", offset=16, datatype=PointField.FLOAT32, count=1),
+                PointField(name="b", offset=20, datatype=PointField.FLOAT32, count=1),
             ],
             is_bigendian=False,
             point_step=24,
@@ -52,10 +69,10 @@ class SensingRegionPointCloudVisualizer:
         )
 
         # pub
-        self.sensing_region_pointcloud_pub = rospy.Publisher("sensing_region_pointcloud", PointCloud2, queue_size=1)
+        self.sensing_region_pointcloud_pub = self.create_publisher(PointCloud2, "sensing_region_pointcloud", 10)
 
         # sub
-        rospy.Subscriber("sensing_region", Int8MultiArray, self.sensing_region_callback)
+        self.create_subscription(Int8MultiArray, "sensing_region", self.sensing_region_callback, 10)
 
     def sensing_region_callback(self, msg: Int8MultiArray) -> None:
         """Int8Multiarrayからpointcloudを生成してpublish
@@ -98,11 +115,16 @@ class SensingRegionPointCloudVisualizer:
 
 
 def main() -> None:
+    rclpy.init()
+    sensing_region_pointcloud_visualizer = SensingRegionPointCloudVisualizer()
+
     try:
-        SensingRegionPointCloudVisualizer()
-        rospy.spin()
+        rclpy.spin(sensing_region_pointcloud_visualizer)
     except:
-        rospy.logerr(traceback.format_exc())
+        sensing_region_pointcloud_visualizer.get_logger().error(traceback.format_exc())
+    finally:
+        sensing_region_pointcloud_visualizer.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == "__main__":
