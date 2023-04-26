@@ -13,14 +13,16 @@ class Voronoi:
 
     Attributes:
         p (float): p-norm
-        radius (float): r-limited voronoi計算における半径．FOVの規定に用いる．Defaults to float("inf")
+        radius (float): r-limited voronoi計算における半径．
+                        FOVの規定に用いる．Defaults to float("inf")
 
     Note:
         各領域内の離散点に相当する位置にはTrue，それ以外にはFalseを割り当てる．
         記号表記はH.Dan et al. 2020に倣う
 
         voronoi_region (NDArray): ボロノイ領域（V_{i}）
-        fov_region (NDArray): 円形センサーモデルによる視野（B_{i}）．デフォルトではボロノイ領域のみを考慮するよう半径を無限大でとっている．
+        fov_region (NDArray): 円形センサーモデルによる視野（B_{i}）．
+                              デフォルトではボロノイ領域のみを考慮するよう半径を無限大でとっている．
         sensing_region (NDArray): センシング領域（S_{i}=V_{i} \bigcap B_{i}）
     """
 
@@ -39,7 +41,8 @@ class Voronoi:
 
         Args:
             agent_position (NDArray): ボロノイ領域の母点
-            neighbor_agent_position_list (List[NDArray]): 近隣の母点．少なくとも近隣が全て含まれていれば良いため，その他の母点が含まれていても，計算上は特に問題はない．
+            neighbor_agent_position_list (List[NDArray]): 近隣の母点．少なくとも近隣が全て含まれていれば良いため，
+                                                          その他の母点が含まれていても，計算上は特に問題はない．
             phi (NDArray): 重要度マップ
             grid_map (List[NDArray]): フィールド離散点の各座標．[x_grid_map, y_grid_map, ...]
             point_density (float): 離散点の密度．離散点1つの担当する面積/体積に相当．
@@ -62,7 +65,7 @@ class Voronoi:
                 [abs(grid_map[i] - neighbor_agent_position[i]) ** self.p for i in range(dim)]
             ) ** (1 / self.p)
 
-            # フィールド離散点の内，近隣エージェント（neighbor_agent_position）より自分（agent_position）からの方が近い点を抽出
+            # 近隣エージェント（neighbor_agent_position）より自分（agent_position）からの方が近い点を抽出
             near_region = distance_from_neighbor_agent > distance_from_agent
             # near_regionの積算により自分が最も近いエージェントとなる離散点を抽出
             voronoi_region *= near_region

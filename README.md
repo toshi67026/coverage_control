@@ -1,21 +1,23 @@
 # coverage_control
 
 ## Requirements
-- Ubuntu20.04
-- ROS Noetic
-- Python3.8
+- Ubuntu22.04
+- ROS2 Humble
+- Python3.10
 
 ## Installation
 ```sh
-cd ~/catkin_ws/src/coverage_control
-python3 -m pip install -r requirements.txt
+cd ~/ros2/src/coverage_control
+python3 -m pip install -r requirements/lib.txt
 rosdep install -i -y --from-paths .
 ```
 
+
 ## Usage
 ### simple coverage control
+TODO: launch argumentからの次元切り替え
 ```sh
-roslaunch coverage_control scc.launch dim:={1, 2, 3}
+ros2 launch coverage_control scc.launch
 ```
 
 #### rviz
@@ -32,6 +34,10 @@ dim:={1, 2, 3}
 ![](assets/scc_2d_rosgraph.png)
 
 ## Tools
+```sh
+sudo python -m pip install -r requirements/tools.txt
+```
+
 ### Format
 - isort
 - black

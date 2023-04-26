@@ -29,7 +29,7 @@ class FieldGenerator:
     def __post_init__(self) -> None:
         dim = len(self.grid_accuracy)
 
-        self.grid_span = (self.limit[:, 1] - self.limit[:, 0]) / self.grid_accuracy
+        self.grid_span = (self.limit[0:dim, 1] - self.limit[0:dim, 0]) / self.grid_accuracy
         # フィールドを隙間なく埋めるため，limit値にオフセットをかける
         self.linspace = [
             np.linspace(

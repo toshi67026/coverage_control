@@ -4,8 +4,10 @@ import traceback
 
 import matplotlib.pyplot as plt
 import numpy as np
-import rospy
+import rclpy
 from numpy.typing import NDArray
+from rcl_interfaces.msg import ParameterDescriptor, ParameterType
+from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2, PointField
 from std_msgs.msg import Float32MultiArray, Header
 
@@ -13,7 +15,7 @@ from coverage_control.field_generator import FieldGenerator
 from coverage_control.utils import multiarray_to_ndarray
 
 
-class PhiPointCloudVisualizer:
+class PhiPointCloudVisualizer(Node):
     """PointCloud2を用いて重要度分布を可視化
 
     Note:
@@ -26,15 +28,28 @@ class PhiPointCloudVisualizer:
     """
 
     def __init__(self) -> None:
-        rospy.init_node("phi_pointcloud_visualizer")
+        super().__init__("phi_pointcloud_visualizer")
 
-        world_frame = str(rospy.get_param("/world_frame", default="world"))
+        # declare parameter
+        self.declare_parameter("world_frame", "world", ParameterDescriptor(type=ParameterType.PARAMETER_STRING))
+        self.declare_parameter(
+            "grid_accuracy", [100, 100, 100], ParameterDescriptor(type=ParameterType.PARAMETER_INTEGER_ARRAY)
+        )
+        self.declare_parameter("x_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter("y_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter("z_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
 
-        # fieldを規定するパラメータを取得
-        field_param = rospy.get_param("/field")
-        grid_accuracy: NDArray = np.array(field_param["grid_accuracy"])
-        limit: NDArray = np.array(field_param["limit"])
-        self.dim = len(grid_accuracy)
+        # get parameter
+        world_frame = self.get_parameter("world_frame").value
+        grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
+        self.dim = len(self.get_parameter("grid_accuracy").value)
+        limit = np.array(
+            [
+                self.get_parameter("x_limit").value,
+                self.get_parameter("y_limit").value,
+                self.get_parameter("z_limit").value,
+            ]
+        )
 
         field_generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
         grid_map = field_generator.generate_grid_map()
@@ -43,17 +58,17 @@ class PhiPointCloudVisualizer:
         # 重要度分布描画用のpointcloudを作成
         self.phi_pointcloud = PointCloud2(
             header=Header(
-                stamp=rospy.Time.now(),
+                stamp=self.get_clock().now().to_msg(),
                 frame_id=world_frame,
             ),
             height=1,
             fields=[
-                PointField("x", 0, PointField.FLOAT32, 1),
-                PointField("y", 4, PointField.FLOAT32, 1),
-                PointField("z", 8, PointField.FLOAT32, 1),
-                PointField("r", 12, PointField.FLOAT32, 1),
-                PointField("g", 16, PointField.FLOAT32, 1),
-                PointField("b", 20, PointField.FLOAT32, 1),
+                PointField(name="x", offset=0, datatype=PointField.FLOAT32, count=1),
+                PointField(name="y", offset=4, datatype=PointField.FLOAT32, count=1),
+                PointField(name="z", offset=8, datatype=PointField.FLOAT32, count=1),
+                PointField(name="r", offset=12, datatype=PointField.FLOAT32, count=1),
+                PointField(name="g", offset=16, datatype=PointField.FLOAT32, count=1),
+                PointField(name="b", offset=20, datatype=PointField.FLOAT32, count=1),
             ],
             is_bigendian=False,
             point_step=24,
@@ -61,10 +76,10 @@ class PhiPointCloudVisualizer:
         )
 
         # pub
-        self.phi_pointcloud_pub = rospy.Publisher("phi_pointcloud", PointCloud2, queue_size=1)
+        self.phi_pointcloud_pub = self.create_publisher(PointCloud2, "phi_pointcloud", 10)
 
         # sub
-        rospy.Subscriber("phi", Float32MultiArray, self.phi_callback)
+        self.create_subscription(Float32MultiArray, "phi", self.phi_callback, 10)
 
     def phi_callback(self, msg: Float32MultiArray) -> None:
         """Float32Multiarrayからpointcloudを生成してpublish
@@ -103,11 +118,16 @@ class PhiPointCloudVisualizer:
 
 
 def main() -> None:
+    rclpy.init()
+    phi_pointcloud_visualizer = PhiPointCloudVisualizer()
+
     try:
-        PhiPointCloudVisualizer()
-        rospy.spin()
+        rclpy.spin(phi_pointcloud_visualizer)
     except:
-        rospy.logerr(traceback.format_exc())
+        phi_pointcloud_visualizer.get_logger().error(traceback.format_exc())
+    finally:
+        phi_pointcloud_visualizer.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == "__main__":

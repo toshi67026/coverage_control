@@ -1,8 +1,5 @@
-.vscode
 build
-devel
-logs
+install
+log
 *.pyc
-__pycache__
-.mypy_cache
-.ruff_cache
+.vscode
