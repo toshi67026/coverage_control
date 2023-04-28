@@ -20,12 +20,14 @@ class Central(Node):
 
         # declare parameter
         self.declare_parameter(
-            "grid_accuracy", [100, 100, 100], ParameterDescriptor(type=ParameterType.PARAMETER_INTEGER_ARRAY)
+            "grid_accuracy", descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_INTEGER_ARRAY)
         )
-        self.declare_parameter("x_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
-        self.declare_parameter("y_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
-        self.declare_parameter("z_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
-        self.declare_parameter("timer_period", 0.1, ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE))
+        self.declare_parameter("x_limit", [-1.0, 1.0], descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter("y_limit", [-1.0, 1.0], descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter("z_limit", [-1.0, 1.0], descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter(
+            "timer_period", 0.1, descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE)
+        )
 
         # get parameter
         grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)

@@ -31,13 +31,13 @@ class PhiPointCloudVisualizer(Node):
         super().__init__("phi_pointcloud_visualizer")
 
         # declare parameter
-        self.declare_parameter("world_frame", "world", ParameterDescriptor(type=ParameterType.PARAMETER_STRING))
+        self.declare_parameter("world_frame", "world", descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_STRING))
         self.declare_parameter(
-            "grid_accuracy", [100, 100, 100], ParameterDescriptor(type=ParameterType.PARAMETER_INTEGER_ARRAY)
+            "grid_accuracy",  descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_INTEGER_ARRAY)
         )
-        self.declare_parameter("x_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
-        self.declare_parameter("y_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
-        self.declare_parameter("z_limit", [-1.0, 1.0], ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter("x_limit",[-1.0, 1.0],descriptor=  ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter("y_limit",[-1.0, 1.0],descriptor=  ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
+        self.declare_parameter("z_limit",[-1.0, 1.0],descriptor=  ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY))
 
         # get parameter
         world_frame = self.get_parameter("world_frame").value

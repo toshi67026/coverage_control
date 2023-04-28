@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
-import os
 from typing import List
 
-from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, GroupAction, OpaqueFunction
 from launch.launch_context import LaunchContext
@@ -12,22 +10,19 @@ from launch_ros.actions import Node, PushRosNamespace, SetParameter, SetParamete
 
 
 def launch_setup(context: LaunchContext) -> List[GroupAction]:
-    pkg_coverage_control = get_package_share_directory("coverage_control")
-    agent_config = LaunchConfiguration(
-        "agent_config", default=os.path.join(pkg_coverage_control, "config", "agent.params.yaml")
-    )
-    base_config = LaunchConfiguration(
-        "base_config", default=os.path.join(pkg_coverage_control, "config", "base.params.yaml")
-    )
+    base_config = LaunchConfiguration("base_config")
+    agent_config = LaunchConfiguration("agent_config")
 
-    # performでLaunchConfigurationの中身を取得
-    agent_id_str = LaunchConfiguration("agent_id").perform(context)
-    agent_name = "agent" + agent_id_str
+    # LaunchConfigurationの中身を取得
+    agent_prefix = LaunchConfiguration("agent_prefix", default="agent").perform(context)
+    agent_id = LaunchConfiguration("agent_id").perform(context)
+    agent_name = agent_prefix + agent_id
 
+    # GroupActionによりnamespaceやparameterを一括して与える
     agent_group = GroupAction(
         actions=[
             PushRosNamespace(agent_name),
-            SetParameter(name="agent_id", value=agent_id_str),
+            SetParameter(name="agent_id", value=agent_id),
             SetParametersFromFile(base_config),
             SetParametersFromFile(agent_config),
             Node(
@@ -52,11 +47,16 @@ def launch_setup(context: LaunchContext) -> List[GroupAction]:
 
 
 def generate_launch_description() -> LaunchDescription:
+    DeclareLaunchArgument("base_config")
+    DeclareLaunchArgument("agent_config")
+    DeclareLaunchArgument("agent_prefix", default_value="agent")
     DeclareLaunchArgument("agent_id")
 
     # Create the launch description and populate
     ld = LaunchDescription()
 
+    # LaunchConfigurationの値を取得するため，OpaqueFunctionで外部実行
+    # ref: https://answers.ros.org/question/340705/access-launch-argument-in-launchfile-ros2/
     ld.add_action(OpaqueFunction(function=launch_setup))
 
     return ld

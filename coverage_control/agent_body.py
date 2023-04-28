@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import traceback
-from random import random
 
 import rclpy
 from geometry_msgs.msg import Point, Pose, Quaternion, Transform, TransformStamped, Twist, Vector3
@@ -19,15 +18,19 @@ class AgentBody(Node):
         # declare parameter
         self.declare_parameter(
             "init_position",
-            [random(), random(), random()],
-            ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY),
+            descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY),
         )
-        self.declare_parameter("init_yaw", 0.0, ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE))
-        self.declare_parameter("world_frame", "world", ParameterDescriptor(type=ParameterType.PARAMETER_STRING))
-        self.declare_parameter("agent_frame", "base", ParameterDescriptor(type=ParameterType.PARAMETER_STRING))
-        self.declare_parameter("dt", 0.1, ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE))
+        self.declare_parameter("init_yaw", 0.0, descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE))
+        self.declare_parameter(
+            "world_frame", "world", descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_STRING)
+        )
+        self.declare_parameter(
+            "agent_frame", "base", descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_STRING)
+        )
+        self.declare_parameter("dt", 0.1, descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE))
 
         # get parameter
+        # parameterのinit_positionの要素数が足りない場合，対応するPointの要素は0.0で初期化される
         init_position = Point(**dict(zip(["x", "y", "z"], self.get_parameter("init_position").value)))
         self.world_frame = self.get_parameter("world_frame").value
         self.agent_frame: str = self.get_namespace() + "/" + self.get_parameter("agent_frame").value
