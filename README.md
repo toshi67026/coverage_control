@@ -7,7 +7,7 @@
 
 ## Installation
 ```sh
-cd ~/ros2/src/coverage_control
+cd ~/ros2_ws/src/coverage_control
 python3 -m pip install -r requirements/lib.txt
 rosdep install -i -y --from-paths .
 ```
@@ -15,22 +15,20 @@ rosdep install -i -y --from-paths .
 
 ## Usage
 ### simple coverage control
-TODO: launch argumentからの次元切り替え
+You can select the dimension of the field from 1 to 3 and the number of agents from 1 to 5.
 ```sh
-ros2 launch coverage_control scc.launch
+ros2 launch coverage_control scc.launch dim:={1,2,3} agent_num:={1,2,3,4,5}
 ```
 
 #### rviz
-By adjusting the launch files and the checkboxes in the rviz panels, the density map and the sensing region of each agent can be drawn as `Marker` and `Pointcloud2` respectively, as shown below.
+By adjusting the launch files and the checkboxes in the rviz panels, the density map(phi) and the sensing region(sr) of each agent can be drawn as `Marker` and `Pointcloud2` respectively, as shown below.
 
-dim:={1, 2, 3}
-
-<img src=assets/scc_1d.png width=50%>
-<img src=assets/scc_2d.png width=50%>
-<img src=assets/scc_3d.png width=50%>
+<img src=assets/scc_1d_3.png width=50%><img src=assets/scc_1d_5_phi.png width=50%>
+<img src=assets/scc_2d_5.png width=50%><img src=assets/scc_2d_5_phi.png width=50%>
+<img src=assets/scc_3d_5.png width=50%><img src=assets/scc_3d_4_phi.png width=50%>
 
 #### rqt_graph
-2d version
+for 2d
 ![](assets/scc_2d_rosgraph.png)
 
 ## Tools
