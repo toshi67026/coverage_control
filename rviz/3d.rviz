@@ -25,7 +25,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: sensing_region0
+    SyncSource: sr0
 Visualization Manager:
   Class: ""
   Displays:
@@ -103,10 +103,10 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /curr_pose_array
-      Value: true
+      Value: false
     - Class: rviz_default_plugins/Marker
       Enabled: false
-      Name: sensing_region0
+      Name: sr0
       Namespaces:
         {}
       Topic:
@@ -119,7 +119,7 @@ Visualization Manager:
       Value: false
     - Class: rviz_default_plugins/Marker
       Enabled: false
-      Name: sensing_region1
+      Name: sr1
       Namespaces:
         {}
       Topic:
@@ -132,7 +132,7 @@ Visualization Manager:
       Value: false
     - Class: rviz_default_plugins/Marker
       Enabled: false
-      Name: seinsing_region2
+      Name: sr2
       Namespaces:
         {}
       Topic:
@@ -145,7 +145,7 @@ Visualization Manager:
       Value: false
     - Class: rviz_default_plugins/Marker
       Enabled: false
-      Name: seinsing_region3
+      Name: sr3
       Namespaces:
         {}
       Topic:
@@ -158,7 +158,7 @@ Visualization Manager:
       Value: false
     - Class: rviz_default_plugins/Marker
       Enabled: false
-      Name: seinsing_region4
+      Name: sr4
       Namespaces:
         {}
       Topic:
@@ -187,7 +187,7 @@ Visualization Manager:
       Max Intensity: 4096
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: sensing_region0
+      Name: sr0
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
@@ -221,7 +221,7 @@ Visualization Manager:
       Max Intensity: 4096
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: sensing_region1
+      Name: sr1
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
@@ -255,7 +255,7 @@ Visualization Manager:
       Max Intensity: 4096
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: sensing_region2
+      Name: sr2
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
@@ -289,7 +289,7 @@ Visualization Manager:
       Max Intensity: 4096
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: sensing_region3
+      Name: sr3
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
@@ -323,7 +323,7 @@ Visualization Manager:
       Max Intensity: 4096
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: sensing_region2
+      Name: sr4
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
@@ -432,7 +432,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 4
+      Distance: 5.082880020141602
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
