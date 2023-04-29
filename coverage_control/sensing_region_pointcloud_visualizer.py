@@ -40,8 +40,8 @@ class SensingRegionPointCloudVisualizer(Node):
         )
 
         # get parameter
-        world_frame = self.get_parameter("world_frame").value
-        self.agent_id = self.get_parameter("agent_id").value
+        world_frame = str(self.get_parameter("world_frame").value)
+        self.agent_id = int(self.get_parameter("agent_id").value)
 
         grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
         self.dim = len(grid_accuracy)

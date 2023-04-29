@@ -5,7 +5,7 @@ import traceback
 import matplotlib.pyplot as plt
 import numpy as np
 import rclpy
-from geometry_msgs.msg import Point, Pose, Quaternion, Vector3
+from geometry_msgs.msg import Point, Vector3
 from numpy.typing import NDArray
 from rcl_interfaces.msg import ParameterDescriptor, ParameterType
 from rclpy.node import Node
@@ -49,7 +49,7 @@ class PhiMarkerVisualizer(Node):
         )
 
         # get parameter
-        world_frame = self.get_parameter("world_frame").value
+        world_frame = str(self.get_parameter("world_frame").value)
         grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
         dim = len(grid_accuracy)
         limit = np.array(
@@ -77,7 +77,6 @@ class PhiMarkerVisualizer(Node):
             ns="phi_marker",
             action=Marker.ADD,
             type=Marker.CUBE_LIST,
-            pose=Pose(orientation=Quaternion(x=0.0, y=0.0, z=0.0, w=1.0)),
             scale=Vector3(
                 **dict(zip(["x", "y", "z"], padding(original_array=field_generator.grid_span, padding_value=0.05)))
             ),

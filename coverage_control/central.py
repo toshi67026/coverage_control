@@ -49,7 +49,7 @@ class Central(Node):
         field_generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
         self.grid_map = field_generator.generate_grid_map()
 
-        timer_period = self.get_parameter("timer_period").get_parameter_value().double_value
+        timer_period = float(self.get_parameter("timer_period").value)
 
         # pub
         self.phi_pub = self.create_publisher(Float32MultiArray, "/phi", 10)

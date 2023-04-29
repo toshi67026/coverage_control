@@ -48,7 +48,7 @@ class PhiPointCloudVisualizer(Node):
         )
 
         # get parameter
-        world_frame = self.get_parameter("world_frame").value
+        world_frame = str(self.get_parameter("world_frame").value)
         grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
         self.dim = len(self.get_parameter("grid_accuracy").value)
         limit = np.array(
