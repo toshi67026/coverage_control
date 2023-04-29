@@ -32,15 +32,15 @@ class AgentBody(Node):
         # get parameter
         # parameterのinit_positionの要素数が足りない場合，対応するPointの要素は0.0で初期化される
         init_position = Point(**dict(zip(["x", "y", "z"], self.get_parameter("init_position").value)))
-        self.world_frame = self.get_parameter("world_frame").value
-        self.agent_frame: str = self.get_namespace() + "/" + self.get_parameter("agent_frame").value
-        self.dt = self.get_parameter("dt").value
+        self.world_frame = str(self.get_parameter("world_frame").value)
+        self.agent_frame = str(self.get_namespace() + "/" + self.get_parameter("agent_frame").value)
+        self.dt = float(self.get_parameter("dt").value)
 
         init_orientation = Quaternion(
             **dict(
                 zip(
                     ["x", "y", "z", "w"],
-                    quaternion_from_euler(ai=0.0, aj=0.0, ak=self.get_parameter("init_yaw").value),
+                    quaternion_from_euler(ai=0.0, aj=0.0, ak=float(self.get_parameter("init_yaw").value)),
                 )
             )
         )
@@ -68,15 +68,16 @@ class AgentBody(Node):
             z=position.z + self.dt * msg.linear.z,
         )
 
-        # 姿勢はとりあえずyawのみ更新
+        # とりあえず姿勢はyawのみ更新
         orientation = self.curr_pose.orientation
         _, _, yaw = euler_from_quaternion(quaternion=[orientation.x, orientation.y, orientation.z, orientation.w])
-        orientation_array = quaternion_from_euler(ai=0.0, aj=0.0, ak=yaw + self.dt * msg.angular.z)
         self.curr_pose.orientation = Quaternion(
-            x=orientation_array[0],
-            y=orientation_array[1],
-            z=orientation_array[2],
-            w=orientation_array[3],
+            **dict(
+                zip(
+                    ["x", "y", "z", "w"],
+                    quaternion_from_euler(ai=0.0, aj=0.0, ak=yaw + self.dt * msg.angular.z),
+                )
+            )
         )
         self.curr_pose_pub.publish(self.curr_pose)
 

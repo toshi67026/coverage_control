@@ -4,7 +4,7 @@ import traceback
 
 import numpy as np
 import rclpy
-from geometry_msgs.msg import Point, Pose, Quaternion, Vector3
+from geometry_msgs.msg import Point, Vector3
 from rcl_interfaces.msg import ParameterDescriptor, ParameterType
 from rclpy.node import Node
 from std_msgs.msg import Header, Int8MultiArray
@@ -39,8 +39,8 @@ class SensingRegionMarkerVisualizer(Node):
         )
 
         # get parameter
-        world_frame = self.get_parameter("world_frame").value
-        self.agent_id = self.get_parameter("agent_id").value
+        world_frame = str(self.get_parameter("world_frame").value)
+        self.agent_id = int(self.get_parameter("agent_id").value)
 
         grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
         self.dim = len(grid_accuracy)
@@ -66,7 +66,6 @@ class SensingRegionMarkerVisualizer(Node):
             ns="sensing_region_marker",
             action=Marker.ADD,
             type=Marker.CUBE_LIST,
-            pose=Pose(orientation=Quaternion(x=0.0, y=0.0, z=0.0, w=1.0)),
             scale=Vector3(
                 **dict(
                     zip(

@@ -36,19 +36,20 @@ class PoseCollector(Node):
             "timer_period", 0.1, descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE)
         )
 
-        self.world_frame = self.get_parameter("world_frame").value
-        agent_num = self.get_parameter("agent_num").value
-        agent_prefix = self.get_parameter("agent_prefix").value
+        self.world_frame = str(self.get_parameter("world_frame").value)
+        agent_num = int(self.get_parameter("agent_num").value)
+        agent_prefix = str(self.get_parameter("agent_prefix").value)
 
         self.data_list: List[Data] = [Data()] * agent_num
         self.is_ready = False
 
-        timer_period = self.get_parameter("timer_period").value
+        timer_period = float(self.get_parameter("timer_period").value)
 
         # pub
         self.curr_pose_array_pub = self.create_publisher(PoseArray, "curr_pose_array", 10)
 
         # sub
+        # agentの数とnamespaceに対応してsubscriptionとcallbackを登録
         for agent_id in range(agent_num):
             agent_name = agent_prefix + str(agent_id)
             topic_name = agent_name + "/curr_pose"

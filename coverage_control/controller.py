@@ -46,9 +46,8 @@ class Controller(Node):
         )
 
         # get parameter
-        self.world_frame = self.get_parameter("world_frame").value
-
-        self.agent_id = self.get_parameter("agent_id").value
+        self.world_frame = str(self.get_parameter("world_frame").value)
+        self.agent_id = int(self.get_parameter("agent_id").value)
 
         # fieldを規定するパラメータを取得
         grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
@@ -71,8 +70,8 @@ class Controller(Node):
 
         self.ref_pose = Pose()
         self.curr_pose = Pose()
-        self.kp = self.get_parameter("kp").value
-        timer_period = self.get_parameter("timer_period").value
+        self.kp = float(self.get_parameter("kp").value)
+        timer_period = float(self.get_parameter("timer_period").value)
 
         # pub
         self.cmd_vel_pub = self.create_publisher(Twist, "cmd_vel", 10)
@@ -103,7 +102,7 @@ class Controller(Node):
         # 近隣エージェントの位置を用いてセンシング領域を計算
         centroid_position, sensing_region_grid_points, sensing_region = self.calc_voronoi_tesselation(msg.poses)
 
-        # 各次元に対応して使わない部分を0で埋めた上で，unpackしたもの目標座標とする
+        # 各次元に対応して使わない要素を0で埋めた上で，unpackしたもの目標座標とする
         self.ref_pose = Pose(position=Point(**dict(zip(["x", "y", "z"], padding(centroid_position)))))
 
         # センシング領域をpublish
