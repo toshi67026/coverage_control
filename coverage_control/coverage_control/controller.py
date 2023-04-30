@@ -23,11 +23,7 @@ class Controller(Node):
         super().__init__("controller")
 
         # declare parameter
-        self.declare_parameter(
-            "world_frame", "world", descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_STRING)
-        )
         self.declare_parameter("agent_id", descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_INTEGER))
-
         self.declare_parameter(
             "grid_accuracy", descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_INTEGER_ARRAY)
         )
@@ -46,12 +42,10 @@ class Controller(Node):
         )
 
         # get parameter
-        self.world_frame = str(self.get_parameter("world_frame").value)
         self.agent_id = int(self.get_parameter("agent_id").value)
 
         # fieldを規定するパラメータを取得
         grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
-        self.dim = len(grid_accuracy)
         limit = np.array(
             [
                 self.get_parameter("x_limit").value,
@@ -89,15 +83,7 @@ class Controller(Node):
         self.curr_pose = msg
 
     def curr_pose_array_callback(self, msg: PoseArray) -> None:
-        """センシング領域とその重心を計算して目標座標へ反映
-
-        Note:
-            センシング領域のpublishに際しては，以下の並びになるようreshapeと転置により整形
-            [[x1, y1, ...],
-            [x2, y2, ...]
-                :
-            [xn, yn, ...]]
-        """
+        """近隣エージェントの位置姿勢から自身のセンシング領域(ボロノイ領域)とその重心を計算して目標座標へ反映"""
 
         # 近隣エージェントの位置を用いてセンシング領域を計算
         centroid_position, sensing_region_grid_points, sensing_region = self.calc_voronoi_tesselation(msg.poses)
@@ -110,7 +96,8 @@ class Controller(Node):
 
     def calc_voronoi_tesselation(self, pose_list: List[Pose]) -> Tuple[NDArray, List[NDArray], NDArray]:
         all_agent_position_list: List[NDArray] = []
-        # Pose型のリストから各エージェント位置を抜き出してNDArray形式へ変換，格納
+
+        # Pose型のリストから各エージェント位置を抜き出してNDArray形式のリストへ変換，格納
         for pose in pose_list:
             all_agent_position_list.append(np.array([pose.position.x, pose.position.y, pose.position.z]))
 
@@ -143,6 +130,7 @@ class Controller(Node):
         y_err = self.ref_pose.position.y - self.curr_pose.position.y
         z_err = self.ref_pose.position.z - self.curr_pose.position.z
 
+        # P制御
         cmd_vel = Twist(
             linear=Vector3(
                 x=self.kp * x_err,
