@@ -12,6 +12,8 @@ from tf_transformations import euler_from_quaternion, quaternion_from_euler
 
 
 class AgentBody(Node):
+    """1次積分系の仮想エージェント"""
+
     def __init__(self) -> None:
         super().__init__("agent_body")
 
@@ -30,25 +32,22 @@ class AgentBody(Node):
         self.declare_parameter("dt", 0.1, descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE))
 
         # get parameter
+        # curr_pose初期化
         # parameterのinit_positionの要素数が足りない場合，対応するPointの要素は0.0で初期化される
-        init_position = Point(**dict(zip(["x", "y", "z"], self.get_parameter("init_position").value)))
+        self.curr_pose = Pose(
+            position=Point(**dict(zip(["x", "y", "z"], self.get_parameter("init_position").value))),
+            orientation=Quaternion(
+                **dict(
+                    zip(
+                        ["x", "y", "z", "w"],
+                        quaternion_from_euler(ai=0.0, aj=0.0, ak=float(self.get_parameter("init_yaw").value)),
+                    )
+                )
+            ),
+        )
         self.world_frame = str(self.get_parameter("world_frame").value)
         self.agent_frame = str(self.get_namespace() + "/" + self.get_parameter("agent_frame").value)
         self.dt = float(self.get_parameter("dt").value)
-
-        init_orientation = Quaternion(
-            **dict(
-                zip(
-                    ["x", "y", "z", "w"],
-                    quaternion_from_euler(ai=0.0, aj=0.0, ak=float(self.get_parameter("init_yaw").value)),
-                )
-            )
-        )
-
-        self.curr_pose = Pose(
-            position=init_position,
-            orientation=init_orientation,
-        )
 
         # tf2
         self.broadcaster = TransformBroadcaster(self)
@@ -60,7 +59,7 @@ class AgentBody(Node):
         self.create_subscription(Twist, "cmd_vel", self.cmd_vel_callback, 10)
 
     def cmd_vel_callback(self, msg: Twist) -> None:
-        # 速度指令を基に位置を更新
+        # 速度指令から積分系に基づき位置を更新
         position = self.curr_pose.position
         self.curr_pose.position = Point(
             x=position.x + self.dt * msg.linear.x,
