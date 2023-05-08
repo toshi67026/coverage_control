@@ -11,8 +11,8 @@ from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2, PointField
 from std_msgs.msg import Header, Int8MultiArray
 
-from coverage_control.field_generator import FieldGenerator
-from coverage_control.utils import color_list, multiarray_to_ndarray
+from .coverage_utils.field_generator import FieldGenerator
+from .coverage_utils.utils import color_list, multiarray_to_ndarray
 
 
 class SensingRegionPointCloudVisualizer(Node):

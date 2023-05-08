@@ -11,8 +11,8 @@ from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2, PointField
 from std_msgs.msg import Float32MultiArray, Header
 
-from coverage_control.field_generator import FieldGenerator
-from coverage_control.utils import multiarray_to_ndarray
+from .coverage_utils.field_generator import FieldGenerator
+from .coverage_utils.utils import multiarray_to_ndarray
 
 
 class PhiPointCloudVisualizer(Node):
