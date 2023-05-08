@@ -8,8 +8,8 @@ from rcl_interfaces.msg import ParameterDescriptor, ParameterType
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
 
-from coverage_control.field_generator import FieldGenerator
-from coverage_control.utils import ndarray_to_multiarray
+from .coverage_utils.field_generator import FieldGenerator
+from .coverage_utils.utils import ndarray_to_multiarray
 
 
 class Central(Node):

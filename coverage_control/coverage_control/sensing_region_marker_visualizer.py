@@ -10,8 +10,8 @@ from rclpy.node import Node
 from std_msgs.msg import Header, Int8MultiArray
 from visualization_msgs.msg import Marker
 
-from coverage_control.field_generator import FieldGenerator
-from coverage_control.utils import color_list, get_color_rgba, multiarray_to_ndarray, padding
+from .coverage_utils.field_generator import FieldGenerator
+from .coverage_utils.utils import color_list, get_color_rgba, multiarray_to_ndarray, padding
 
 
 class SensingRegionMarkerVisualizer(Node):
