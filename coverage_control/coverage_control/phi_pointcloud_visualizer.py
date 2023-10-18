@@ -46,6 +46,9 @@ class PhiPointCloudVisualizer(Node):
         self.declare_parameter(
             "z_limit", [-1.0, 1.0], descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY)
         )
+        self.declare_parameter(
+            "phi_z_max", descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE)
+        )
 
         # get parameter
         world_frame = str(self.get_parameter("world_frame").value)
@@ -58,6 +61,7 @@ class PhiPointCloudVisualizer(Node):
                 self.get_parameter("z_limit").value,
             ]
         )
+        self.phi_z_max = float(self.get_parameter("phi_z_max").value)
 
         field_generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
         grid_map = field_generator.generate_grid_map()
@@ -114,6 +118,16 @@ class PhiPointCloudVisualizer(Node):
             [
                 self.rows,
                 np.zeros([self.rows.shape[0], 3 - self.dim]),
+                rgba_phi[:, 0:3],
+            ]
+        ).astype(np.float32)
+        # 重要度phiを正規化
+        normalized_phi = phi / np.max(phi)
+
+        points = np.hstack(
+            [
+                self.rows,
+                normalized_phi * self.phi_z_max,
                 rgba_phi[:, 0:3],
             ]
         ).astype(np.float32)

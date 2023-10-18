@@ -3,6 +3,7 @@
     grid_accuracy: [50, 50]
     x_limit: [-1.0, 1.0]
     y_limit: [-1.0, 1.0]
+    phi_z_max: 0.5
 
 agent0:
   agent_body:
