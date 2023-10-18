@@ -48,6 +48,9 @@ class PhiMarkerVisualizer(Node):
             "z_limit", [-1.0, 1.0], descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY)
         )
 
+        self.declare_parameter(
+            "phi_z_max", descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE)
+        )
         # get parameter
         world_frame = str(self.get_parameter("world_frame").value)
         grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
@@ -60,8 +63,11 @@ class PhiMarkerVisualizer(Node):
             ]
         )
 
+        # 重要度をz軸で表す際の最大値
+        self.phi_z_max = float(self.get_parameter("phi_z_max").value)
+
         # 次元に応じて適切な透過度を選択
-        self.alpha = 0.7 - 0.2 * dim
+        self.alpha = 0.2
 
         field_generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
         grid_map = field_generator.generate_grid_map()
@@ -95,9 +101,16 @@ class PhiMarkerVisualizer(Node):
         rgba_phi: NDArray = plt.get_cmap("jet")(phi).squeeze()
 
         self.phi_marker.header.stamp = self.get_clock().now().to_msg()
-        # 2次元以下の場合は足りない座標分を0埋め
+
+        # 重要度phiを正規化
+        normalized_phi = phi / np.max(phi)
+
         self.phi_marker.points = [
-            Point(**dict(zip(["x", "y", "z"], point))) for point in [padding(point) for point in self.rows]
+            Point(**dict(zip(["x", "y", "z"], point)))
+            for point in [
+                padding(point, padding_value=float(each_phi))
+                for point, each_phi in zip(self.rows, normalized_phi * self.phi_z_max)
+            ]
         ]
         self.phi_marker.colors = [
             ColorRGBA(**dict(zip(["r", "g", "b", "a"], [*rgb, self.alpha]))) for rgb in rgba_phi[:, 0:3]
