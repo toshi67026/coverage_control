@@ -32,8 +32,16 @@ By adjusting the launch files and the checkboxes in the rviz panels, the density
 <img src=assets/scc_3d_5.png width=50%><img src=assets/scc_3d_4_phi.png width=50%>
 
 #### rqt_graph
-for 2d
-![](assets/scc_2d_rosgraph.png)
+<img src=assets/scc_2d_rosgraph.png width=100%>
+
+### persistent coverage control(pcc-devel branch)
+```sh
+ros2 launch coverage_control pcc.launch dim:={1,2,3} agent_num:={1,2,3,4,5}
+```
+
+#### rviz
+<img src=assets/pcc_2d_5.gif width=70%>
+<img src=assets/pcc_3d_5.gif width=70%>
 
 ## Tools
 ### Format
