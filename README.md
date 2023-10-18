@@ -12,6 +12,10 @@ python3 -m pip install -r requirements/lib.txt
 rosdep install -i -y --from-paths .
 ```
 
+```sh
+sudo python -m pip install -r requirements/tools.txt
+```
+
 
 ## Usage
 ### simple coverage control
@@ -32,10 +36,6 @@ for 2d
 ![](assets/scc_2d_rosgraph.png)
 
 ## Tools
-```sh
-sudo python -m pip install -r requirements/tools.txt
-```
-
 ### Format
 - isort
 - black
