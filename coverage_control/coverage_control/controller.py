@@ -11,9 +11,9 @@ from rcl_interfaces.msg import ParameterDescriptor, ParameterType
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray, Int8MultiArray
 
-from coverage_control.field_generator import FieldGenerator
-from coverage_control.utils import multiarray_to_ndarray, ndarray_to_multiarray, padding
-from coverage_control.voronoi import Voronoi
+from .coverage_utils.field_generator import FieldGenerator
+from .coverage_utils.utils import multiarray_to_ndarray, ndarray_to_multiarray, padding
+from .coverage_utils.voronoi import Voronoi
 
 
 class Controller(Node):
