@@ -7,3 +7,7 @@
     kp: 1.0
     timer_period: 0.1
     dt: 0.1
+
+    delta_decrease: 0.5
+    delta_increase: 0.05
+    sensing_radius: 0.3

@@ -47,7 +47,7 @@ def launch_setup(context: LaunchContext) -> List[Union[Node, GroupAction, Launch
             Node(
                 package="coverage_control",
                 executable="central",
-                parameters=[{"init_phi_type": init_phi_type}],
+                parameters=[{"init_phi_type": init_phi_type, "agent_num": agent_num}],
             ),
             Node(package="coverage_control", executable="phi_marker_visualizer"),
             Node(package="coverage_control", executable="phi_pointcloud_visualizer"),
