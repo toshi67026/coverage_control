@@ -36,6 +36,9 @@ class Controller(Node):
         self.declare_parameter(
             "z_limit", [-1.0, 1.0], descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE_ARRAY)
         )
+        self.declare_parameter(
+            "sensing_radius", 0.5, descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE)
+        )
         self.declare_parameter("kp", 1.0, descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE))
         self.declare_parameter(
             "timer_period", 0.1, descriptor=ParameterDescriptor(type=ParameterType.PARAMETER_DOUBLE)
@@ -60,7 +63,9 @@ class Controller(Node):
         self.phi = field_generator.generate_phi()
         self.grid_map = field_generator.generate_grid_map()
         self.point_density = np.prod(field_generator.grid_span)
-        self.voronoi = Voronoi()
+
+        sensing_radius = float(self.get_parameter("sensing_radius").value)
+        self.voronoi = Voronoi(radius=sensing_radius)  # r-limited voronoi
 
         self.ref_pose = Pose()
         self.curr_pose = Pose()
