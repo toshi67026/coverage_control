@@ -22,8 +22,8 @@ setup(
     zip_safe=True,
     maintainer="Toshiyuki Oshima",
     maintainer_email="toshiyuki67026@gmail.com",
-    description="TODO: Package description",
-    license="TODO: License declaration",
+    description="Package for experiencing coverage control",
+    license="Apache License2.0",
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [

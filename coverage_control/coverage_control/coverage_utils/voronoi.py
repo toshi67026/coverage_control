@@ -48,7 +48,8 @@ class Voronoi:
             point_density (float): 離散点の密度．離散点1つの担当する面積/体積に相当．
 
         Returns:
-            Tuple[NDArray, List[NDArray]]: ボロノイ重心，ボロノイ領域を示す離散点の座標集合
+            Tuple[NDArray, List[NDArray], NDArray]:
+            ボロノイ重心，ボロノイ領域を示す離散点の座標集合，ボロノイ領域内外を1/0で示したマップ
         """
 
         dim = len(grid_map)
