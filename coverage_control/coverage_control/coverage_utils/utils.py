@@ -60,3 +60,14 @@ def multiarray_to_ndarray(pytype: Any, dtype: Any, multiarray: MultiArray) -> ND
     """Convert multiarray to numpy.ndarray"""
     dims = [multiarray.layout.dim[i].size for i in range(len(multiarray.layout.dim))]  # type: ignore
     return np.array(multiarray.data, dtype=pytype).reshape(dims).astype(dtype)  # type: ignore
+
+
+def smooth_ramp(x: Union[float, NDArray]) -> NDArray:
+    """連続なランプ関数
+
+    Note:
+        f(x) = \exp{-SR(x^2-R^2)^2}で山が平らに潰れた凹型の関数が得られる
+        ____      ____
+            \____/
+    """
+    return x * (np.arctan(x) / np.pi + 1 / 2)

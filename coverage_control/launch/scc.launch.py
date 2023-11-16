@@ -16,8 +16,10 @@ from launch.substitutions import LaunchConfiguration
 def launch_setup(context: LaunchContext) -> List[Union[Node, GroupAction, LaunchDescription]]:
     dim = int(LaunchConfiguration("dim").perform(context))
     assert dim in range(1, 4), f"invalid dimension: {dim}"
-    agent_num = int(LaunchConfiguration("agent_num").perform(context))
+    agent_num = int(LaunchConfiguration("num").perform(context))
     assert agent_num in range(1, 6), f"invalid agent_num: {agent_num}"
+    init_phi_type = int(LaunchConfiguration("phi").perform(context))
+    assert init_phi_type in range(1, 4), f"invalid init_phi_type: {init_phi_type}"
 
     pkg_coverage_control = get_package_share_directory("coverage_control")
     rviz_config = os.path.join(pkg_coverage_control, "rviz", f"{dim}d.rviz")
@@ -42,7 +44,11 @@ def launch_setup(context: LaunchContext) -> List[Union[Node, GroupAction, Launch
                 parameters=[{"agent_num": agent_num}],
                 output="screen",
             ),
-            Node(package="coverage_control", executable="central"),
+            Node(
+                package="coverage_control",
+                executable="central",
+                parameters=[{"init_phi_type": init_phi_type}],
+            ),
             Node(package="coverage_control", executable="phi_marker_visualizer"),
             Node(package="coverage_control", executable="phi_pointcloud_visualizer"),
         ]
@@ -65,7 +71,8 @@ def launch_setup(context: LaunchContext) -> List[Union[Node, GroupAction, Launch
 
 def generate_launch_description() -> LaunchDescription:
     DeclareLaunchArgument("dim", default_value="2", description="\in {1, 2, 3}")
-    DeclareLaunchArgument("agent_num", default_value="3", description="< 7")
+    DeclareLaunchArgument("num", default_value="3", description="< 7")
+    DeclareLaunchArgument("phi", default_value="1", description="\in {1, 2, 3}")
 
     # Create the launch description and populate
     ld = LaunchDescription()

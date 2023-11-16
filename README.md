@@ -19,9 +19,13 @@ sudo python -m pip install -r requirements/tools.txt
 
 ## Usage
 ### simple coverage control
-You can select the dimension of the field from 1 to 3 and the number of agents from 1 to 5.
+You can select the following parameter through the launch argument:
+- dimension of the field: {1,2,3}
+- number of agents: {1,2,3,4,5}
+- initial density function(phi) type: {1: Uniform, 2: Gaussian, 3: Disk}
+
 ```sh
-ros2 launch coverage_control scc.launch dim:={1,2,3} agent_num:={1,2,3,4,5}
+ros2 launch coverage_control scc.launch dim:={1,2,3} num:={1,2,3,4,5} phi:={1,2,3}
 ```
 
 #### rviz
