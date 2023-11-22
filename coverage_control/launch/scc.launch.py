@@ -14,11 +14,11 @@ from launch.substitutions import LaunchConfiguration
 
 
 def launch_setup(context: LaunchContext) -> List[Union[Node, GroupAction, LaunchDescription]]:
-    dim = int(LaunchConfiguration("dim").perform(context))
+    dim = int(LaunchConfiguration("dim", default=2).perform(context))
     assert dim in range(1, 4), f"invalid dimension: {dim}"
-    agent_num = int(LaunchConfiguration("num").perform(context))
+    agent_num = int(LaunchConfiguration("num", default=3).perform(context))
     assert agent_num in range(1, 6), f"invalid agent_num: {agent_num}"
-    init_phi_type = int(LaunchConfiguration("phi").perform(context))
+    init_phi_type = int(LaunchConfiguration("phi", default=1).perform(context))
     assert init_phi_type in range(1, 4), f"invalid init_phi_type: {init_phi_type}"
 
     pkg_coverage_control = get_package_share_directory("coverage_control")
@@ -70,9 +70,9 @@ def launch_setup(context: LaunchContext) -> List[Union[Node, GroupAction, Launch
 
 
 def generate_launch_description() -> LaunchDescription:
-    DeclareLaunchArgument("dim", default_value="2", description="\in {1, 2, 3}")
-    DeclareLaunchArgument("num", default_value="3", description="< 7")
-    DeclareLaunchArgument("phi", default_value="1", description="\in {1, 2, 3}")
+    DeclareLaunchArgument("dim", description="\in {1, 2, 3}")
+    DeclareLaunchArgument("num", description="< 6")
+    DeclareLaunchArgument("phi", description="\in {1, 2, 3}")
 
     # Create the launch description and populate
     ld = LaunchDescription()

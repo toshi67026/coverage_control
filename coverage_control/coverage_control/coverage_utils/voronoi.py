@@ -49,7 +49,7 @@ class Voronoi:
 
         Returns:
             Tuple[NDArray, List[NDArray], NDArray]:
-            ボロノイ重心，ボロノイ領域を示す離散点の座標集合，ボロノイ領域内外を1/0で示したマップ
+            ボロノイ重心，ボロノイ領域を示す離散点の座標集合（grid_mapと合わせて座標軸ごとにまとめてリストの要素とする），ボロノイ領域内外を1/0で示したマップ
         """
 
         dim = len(grid_map)

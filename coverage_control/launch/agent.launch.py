@@ -50,7 +50,7 @@ def launch_setup(context: LaunchContext) -> List[GroupAction]:
 def generate_launch_description() -> LaunchDescription:
     DeclareLaunchArgument("base_config")
     DeclareLaunchArgument("agent_config")
-    DeclareLaunchArgument("agent_prefix", default_value="agent")
+    DeclareLaunchArgument("agent_prefix")
     DeclareLaunchArgument("agent_id")
 
     # Create the launch description and populate
