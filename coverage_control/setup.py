@@ -30,6 +30,7 @@ setup(
             "agent_body = coverage_control.agent_body:main",
             "central = coverage_control.central:main",
             "controller = coverage_control.controller:main",
+            "field_cbf_optimizer = coverage_control.field_cbf_optimizer:main",
             "phi_marker_visualizer = coverage_control.phi_marker_visualizer:main",
             "phi_pointcloud_visualizer = coverage_control.phi_pointcloud_visualizer:main",
             "pose_collector = coverage_control.pose_collector:main",

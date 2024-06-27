@@ -16,6 +16,7 @@ rosdep install -i -y --from-paths .
 sudo python -m pip install -r requirements/tools.txt
 ```
 
+[cbfpy/installation](https://github.com/toshi67026/cbfpy#installation)
 
 ## Usage
 ### simple coverage control

@@ -7,3 +7,8 @@
     kp: 1.0
     timer_period: 0.1
     dt: 0.1
+
+    cbf_x_limit: [-0.5, 1.5]
+    cbf_y_limit: [-0.3, 0.8]
+    cbf_theta: 0.1
+    cbf_keep_inside: False

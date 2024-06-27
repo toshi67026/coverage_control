@@ -28,11 +28,17 @@ def launch_setup(context: LaunchContext) -> List[GroupAction]:
             SetParametersFromFile(agent_config),
             Node(
                 package="coverage_control",
+                executable="field_cbf_optimizer",
+            ),
+            Node(
+                package="coverage_control",
                 executable="agent_body",
+                remappings=[("cmd_vel" ,"cmd_vel_opt")],
             ),
             Node(
                 package="coverage_control",
                 executable="controller",
+                remappings=[("cmd_vel" ,"cmd_vel_nom")],
             ),
             Node(
                 package="coverage_control",
