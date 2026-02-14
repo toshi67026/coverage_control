@@ -1,0 +1,16 @@
+services:
+  coverage-native:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: coverage-control:humble
+    platform: ${DOCKER_PLATFORM:-linux/arm64}
+    working_dir: /ws
+    volumes:
+      - ..:/ws/src/coverage_control
+    ports:
+      - "6080:6080"
+    stdin_open: true
+    tty: true
+    command: >
+      bash -lc "/usr/local/bin/run_with_novnc.sh"

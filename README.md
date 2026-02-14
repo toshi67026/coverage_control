@@ -67,3 +67,50 @@ task lint
 ```sh
 task mypy
 ```
+
+## Run On macOS With Docker (Auto GUI via Browser)
+### 1. Prerequisites
+- Docker Desktop for Mac
+
+### 2. Run natively on Apple Silicon (`linux/arm64`)
+```sh
+cd coverage_control/docker
+DOCKER_PLATFORM=linux/arm64 docker compose -f compose.mac.yaml up --build
+```
+
+### 3. Emulate x86_64 on Apple Silicon (`linux/amd64`)
+```sh
+cd coverage_control/docker
+DOCKER_PLATFORM=linux/amd64 docker compose -f compose.mac.yaml up --build
+```
+
+### 4. Open GUI automatically
+After startup, open:
+- `http://localhost:6080/vnc.html`
+
+`rviz2` is launched inside a virtual desktop and streamed by noVNC.
+
+### 4. Optional: rviz2 GUI forwarding on macOS
+```sh
+# host side
+xhost +localhost
+```
+
+Then add `DISPLAY=host.docker.internal:0` to the compose service environment.
+
+### Troubleshooting
+If launch succeeds but agents stop, check logs:
+```sh
+docker compose -f compose.mac.yaml logs --tail=200
+```
+
+Known issues:
+- `AttributeError: np.maximum_sctype was removed ...`
+  - Cause: `transforms3d` from ROS2 Humble is not compatible with NumPy 2.x.
+  - Fix: this repository pins NumPy to `<1.24` in `requirements/lib.txt`. Rebuild image after pull/update.
+
+Rebuild after dependency changes:
+```sh
+docker compose -f compose.mac.yaml down
+DOCKER_PLATFORM=linux/amd64 docker compose -f compose.mac.yaml up --build
+```
