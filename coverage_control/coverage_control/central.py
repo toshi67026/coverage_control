@@ -11,6 +11,7 @@ from std_msgs.msg import Float32MultiArray
 
 from .coverage_utils.field_generator import FieldGenerator
 from .coverage_utils.utils import ndarray_to_multiarray, smooth_ramp
+from .node_utils import get_field_params
 
 
 class InitPhiType(IntEnum):
@@ -48,15 +49,10 @@ class Central(Node):
         )
 
         # get parameter
-        grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
-        self.dim = len(self.get_parameter("grid_accuracy").value)
-        limit = np.array(
-            [
-                self.get_parameter("x_limit").value,
-                self.get_parameter("y_limit").value,
-                self.get_parameter("z_limit").value,
-            ]
-        )
+        field_params = get_field_params(self)
+        grid_accuracy = field_params.grid_accuracy
+        limit = field_params.limit
+        self.dim = field_params.dim
         center = np.sum(limit, axis=1) / 2.0
         width = np.diff(limit, axis=1)
         init_phi_type = InitPhiType(int(self.get_parameter("init_phi_type").value))
@@ -97,7 +93,7 @@ def main() -> None:
 
     try:
         rclpy.spin(central)
-    except:
+    except Exception:
         central.get_logger().error(traceback.format_exc())
     finally:
         central.destroy_node()

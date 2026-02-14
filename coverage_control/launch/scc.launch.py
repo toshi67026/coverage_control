@@ -20,14 +20,19 @@ def launch_setup(context: LaunchContext) -> List[Union[Node, GroupAction, Launch
     assert agent_num in range(1, 6), f"invalid agent_num: {agent_num}"
     init_phi_type = int(LaunchConfiguration("phi", default=1).perform(context))
     assert init_phi_type in range(1, 4), f"invalid init_phi_type: {init_phi_type}"
+    use_rviz = LaunchConfiguration("rviz", default="true").perform(context).lower() in ("1", "true", "yes")
 
     pkg_coverage_control = get_package_share_directory("coverage_control")
     rviz_config = os.path.join(pkg_coverage_control, "rviz", f"{dim}d.rviz")
     assert os.path.exists(rviz_config)
-    rviz_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        arguments=["-d", rviz_config],
+    rviz_node = (
+        Node(
+            package="rviz2",
+            executable="rviz2",
+            arguments=["-d", rviz_config],
+        )
+        if use_rviz
+        else None
     )
 
     base_config = os.path.join(pkg_coverage_control, "config", "base.params.yaml")
@@ -66,16 +71,18 @@ def launch_setup(context: LaunchContext) -> List[Union[Node, GroupAction, Launch
         for agent_id in range(agent_num)
     ]
     # nodeの起動順に起因するagentのジャンプを防ぐため，central系を後に
-    return agent_launch_list + [rviz_node, central_group]
+    actions: List[Union[Node, GroupAction, LaunchDescription]] = agent_launch_list + [central_group]
+    if rviz_node is not None:
+        actions.insert(len(agent_launch_list), rviz_node)
+    return actions
 
 
 def generate_launch_description() -> LaunchDescription:
-    DeclareLaunchArgument("dim", description="\in {1, 2, 3}")
-    DeclareLaunchArgument("num", description="< 6")
-    DeclareLaunchArgument("phi", description="\in {1, 2, 3}")
-
-    # Create the launch description and populate
     ld = LaunchDescription()
+    ld.add_action(DeclareLaunchArgument("dim", description="in {1, 2, 3}"))
+    ld.add_action(DeclareLaunchArgument("num", description="in {1, 2, 3, 4, 5}"))
+    ld.add_action(DeclareLaunchArgument("phi", description="in {1, 2, 3}"))
+    ld.add_action(DeclareLaunchArgument("rviz", default_value="true", description="true/false"))
 
     ld.add_action(OpaqueFunction(function=launch_setup))
 

@@ -48,13 +48,11 @@ def launch_setup(context: LaunchContext) -> List[GroupAction]:
 
 
 def generate_launch_description() -> LaunchDescription:
-    DeclareLaunchArgument("base_config")
-    DeclareLaunchArgument("agent_config")
-    DeclareLaunchArgument("agent_prefix")
-    DeclareLaunchArgument("agent_id")
-
-    # Create the launch description and populate
     ld = LaunchDescription()
+    ld.add_action(DeclareLaunchArgument("base_config"))
+    ld.add_action(DeclareLaunchArgument("agent_config"))
+    ld.add_action(DeclareLaunchArgument("agent_prefix", default_value="agent"))
+    ld.add_action(DeclareLaunchArgument("agent_id"))
 
     # LaunchConfigurationの値を取得するため，OpaqueFunctionで外部実行
     # ref: https://answers.ros.org/question/340705/access-launch-argument-in-launchfile-ros2/

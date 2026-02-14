@@ -14,6 +14,7 @@ from visualization_msgs.msg import Marker
 
 from .coverage_utils.field_generator import FieldGenerator
 from .coverage_utils.utils import multiarray_to_ndarray, padding
+from .node_utils import get_field_params
 
 
 class PhiMarkerVisualizer(Node):
@@ -50,15 +51,10 @@ class PhiMarkerVisualizer(Node):
 
         # get parameter
         world_frame = str(self.get_parameter("world_frame").value)
-        grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
-        dim = len(grid_accuracy)
-        limit = np.array(
-            [
-                self.get_parameter("x_limit").value,
-                self.get_parameter("y_limit").value,
-                self.get_parameter("z_limit").value,
-            ]
-        )
+        field_params = get_field_params(self)
+        grid_accuracy = field_params.grid_accuracy
+        limit = field_params.limit
+        dim = field_params.dim
 
         # 次元に応じて適切な透過度を選択
         self.alpha = 0.7 - 0.2 * dim
@@ -111,7 +107,7 @@ def main() -> None:
 
     try:
         rclpy.spin(phi_marker_visualizer)
-    except:
+    except Exception:
         phi_marker_visualizer.get_logger().error(traceback.format_exc())
     finally:
         phi_marker_visualizer.destroy_node()

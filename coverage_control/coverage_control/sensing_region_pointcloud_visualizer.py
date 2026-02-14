@@ -13,6 +13,7 @@ from std_msgs.msg import Header, Int8MultiArray
 
 from .coverage_utils.field_generator import FieldGenerator
 from .coverage_utils.utils import color_list, multiarray_to_ndarray
+from .node_utils import get_field_params
 
 
 class SensingRegionPointCloudVisualizer(Node):
@@ -43,15 +44,10 @@ class SensingRegionPointCloudVisualizer(Node):
         world_frame = str(self.get_parameter("world_frame").value)
         self.agent_id = int(self.get_parameter("agent_id").value)
 
-        grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
-        self.dim = len(grid_accuracy)
-        limit = np.array(
-            [
-                self.get_parameter("x_limit").value,
-                self.get_parameter("y_limit").value,
-                self.get_parameter("z_limit").value,
-            ]
-        )
+        field_params = get_field_params(self)
+        grid_accuracy = field_params.grid_accuracy
+        limit = field_params.limit
+        self.dim = field_params.dim
 
         field_generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
         self.grid_map = field_generator.generate_grid_map()
@@ -128,7 +124,7 @@ def main() -> None:
 
     try:
         rclpy.spin(sensing_region_pointcloud_visualizer)
-    except:
+    except Exception:
         sensing_region_pointcloud_visualizer.get_logger().error(traceback.format_exc())
     finally:
         sensing_region_pointcloud_visualizer.destroy_node()

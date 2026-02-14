@@ -13,6 +13,7 @@ from std_msgs.msg import Float32MultiArray, Header
 
 from .coverage_utils.field_generator import FieldGenerator
 from .coverage_utils.utils import multiarray_to_ndarray
+from .node_utils import get_field_params
 
 
 class PhiPointCloudVisualizer(Node):
@@ -49,15 +50,10 @@ class PhiPointCloudVisualizer(Node):
 
         # get parameter
         world_frame = str(self.get_parameter("world_frame").value)
-        grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
-        self.dim = len(self.get_parameter("grid_accuracy").value)
-        limit = np.array(
-            [
-                self.get_parameter("x_limit").value,
-                self.get_parameter("y_limit").value,
-                self.get_parameter("z_limit").value,
-            ]
-        )
+        field_params = get_field_params(self)
+        grid_accuracy = field_params.grid_accuracy
+        limit = field_params.limit
+        self.dim = field_params.dim
 
         field_generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
         grid_map = field_generator.generate_grid_map()
@@ -131,7 +127,7 @@ def main() -> None:
 
     try:
         rclpy.spin(phi_pointcloud_visualizer)
-    except:
+    except Exception:
         phi_pointcloud_visualizer.get_logger().error(traceback.format_exc())
     finally:
         phi_pointcloud_visualizer.destroy_node()

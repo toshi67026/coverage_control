@@ -48,8 +48,9 @@ MultiArray = TypeVar("MultiArray")
 def ndarray_to_multiarray(multiarray_type: MultiArray, ndarray: NDArray) -> MultiArray:
     """Convert numpy.ndarray to multiarray"""
     multiarray = multiarray_type()  # type: ignore
+    strides = [int(np.prod(ndarray.shape[i:])) for i in range(ndarray.ndim)]
     multiarray.layout.dim = [
-        MultiArrayDimension(label=f"dim{i}", size=ndarray.shape[i], stride=ndarray.shape[i] * ndarray.dtype.itemsize)
+        MultiArrayDimension(label=f"dim{i}", size=int(ndarray.shape[i]), stride=strides[i])
         for i in range(ndarray.ndim)
     ]
     multiarray.data: List[float] = ndarray.reshape(1, -1)[0].tolist()  # type: ignore
@@ -63,7 +64,7 @@ def multiarray_to_ndarray(pytype: Any, dtype: Any, multiarray: MultiArray) -> ND
 
 
 def smooth_ramp(x: Union[float, NDArray]) -> NDArray:
-    """連続なランプ関数
+    r"""連続なランプ関数
 
     Note:
         f(x) = \exp{-SR(x^2-R^2)^2}で山が平らに潰れた凹型の関数が得られる

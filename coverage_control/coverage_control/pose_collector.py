@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import traceback
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import partial
 from typing import List
 
@@ -14,7 +14,7 @@ from std_msgs.msg import Header
 
 @dataclass
 class Data:
-    curr_pose: Pose = Pose()
+    curr_pose: Pose = field(default_factory=Pose)
     is_ready: bool = False
 
 
@@ -40,7 +40,7 @@ class PoseCollector(Node):
         agent_num = int(self.get_parameter("agent_num").value)
         agent_prefix = str(self.get_parameter("agent_prefix").value)
 
-        self.data_list: List[Data] = [Data()] * agent_num
+        self.data_list: List[Data] = [Data() for _ in range(agent_num)]
         self.is_ready = False
 
         timer_period = float(self.get_parameter("timer_period").value)
@@ -85,7 +85,7 @@ def main() -> None:
 
     try:
         rclpy.spin(pose_collector)
-    except:
+    except Exception:
         pose_collector.get_logger().error(traceback.format_exc())
     finally:
         pose_collector.destroy_node()

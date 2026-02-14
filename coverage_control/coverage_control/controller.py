@@ -14,6 +14,7 @@ from std_msgs.msg import Float32MultiArray, Int8MultiArray
 from .coverage_utils.field_generator import FieldGenerator
 from .coverage_utils.utils import multiarray_to_ndarray, ndarray_to_multiarray, padding
 from .coverage_utils.voronoi import Voronoi
+from .node_utils import get_field_params
 
 
 class Controller(Node):
@@ -45,14 +46,9 @@ class Controller(Node):
         self.agent_id = int(self.get_parameter("agent_id").value)
 
         # fieldを規定するパラメータを取得
-        grid_accuracy = np.array(self.get_parameter("grid_accuracy").value)
-        limit = np.array(
-            [
-                self.get_parameter("x_limit").value,
-                self.get_parameter("y_limit").value,
-                self.get_parameter("z_limit").value,
-            ]
-        )
+        field_params = get_field_params(self)
+        grid_accuracy = field_params.grid_accuracy
+        limit = field_params.limit
 
         field_generator = FieldGenerator(grid_accuracy=grid_accuracy, limit=limit)
 
@@ -147,7 +143,7 @@ def main() -> None:
 
     try:
         rclpy.spin(controller)
-    except:
+    except Exception:
         controller.get_logger().error(traceback.format_exc())
     finally:
         controller.destroy_node()

@@ -103,7 +103,7 @@ def main() -> None:
 
     try:
         rclpy.spin(agent_body)
-    except:
+    except Exception:
         agent_body.get_logger().error(traceback.format_exc())
     finally:
         agent_body.destroy_node()
